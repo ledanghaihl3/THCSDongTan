@@ -41,7 +41,7 @@ export const get = async (sql, params = []) => {
 // Initialize database tables & seed initial data
 export const initDb = async () => {
   if (isSupabaseReady()) {
-    console.log('[Supabase Cloud] Đã kích hoạt cơ sở dữ liệu Supabase: https://forlinccjrammjpacpxg.supabase.co');
+    console.log('[Supabase Cloud] Đã kích hoạt cơ sở dữ liệu Supabase: https://mwhnntsojaxehyqoxapr.supabase.co');
   }
 
   db.serialize(async () => {

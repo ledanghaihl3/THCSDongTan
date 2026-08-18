@@ -1,7 +1,7 @@
 -- ==============================================================================
 -- KỊCH BẢN KHỞI TẠO TOÀN BỘ CƠ SỞ DỮ LIỆU CHUẨN DÀNH CHO SUPABASE CLOUD
 -- Dự án: Trường THCS Đồng Tân (Lang Son)
--- Supabase URL: https://forlinccjrammjpacpxg.supabase.co
+-- Supabase URL: https://mwhnntsojaxehyqoxapr.supabase.co
 -- ==============================================================================
 
 -- 1. XÓA BẢNG CŨ (NẾU TỒN TẠI) ĐỂ KHỞI TẠO MỚI TOÀN BỘ

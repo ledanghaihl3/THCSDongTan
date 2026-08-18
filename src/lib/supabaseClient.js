@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Official Supabase Credentials for THCS Đồng Tân Portal
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://forlinccjrammjpacpxg.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvcmxpbmNjanJhbW1qcGFjcHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMzcwNDEsImV4cCI6MjEwMjYxMzA0MX0.6ZykQ6Jx9SQDCwzGvSH5Jim6KsnAfWGVrd3oOQQZzHs';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mwhnntsojaxehyqoxapr.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13aG5udHNvamF4ZWh5cW94YXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNDE5MDUsImV4cCI6MjEwMjYxNzkwNX0.MpSyfNoCgLtw_8OPEMfp2R5-8Juy2obUA8qOAOnso3M';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
