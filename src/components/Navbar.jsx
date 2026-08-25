@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Info, Newspaper, FileText, Image, Video, BookOpen, Calendar, Mail, ShieldAlert, Upload, UserPlus, Layers, KeyRound, LogOut, ChevronDown, UserCheck, LogIn, LayoutDashboard } from 'lucide-react';
+import { Home, Info, Newspaper, FileText, Image, Video, BookOpen, Calendar, Mail, ShieldAlert, Upload, UserPlus, Layers, KeyRound, LogOut, ChevronDown, UserCheck, LogIn, LayoutDashboard, Laptop } from 'lucide-react';
 
 export default function Navbar({ user, activeTab, setActiveTab, onOpenAdmin, onOpenUpload, onOpenBulkUpload, onOpenRegister, onOpenLogin, onOpenChangePassword, onOpenMemberZone, onLogout }) {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -9,6 +9,7 @@ export default function Navbar({ user, activeTab, setActiveTab, onOpenAdmin, onO
     { id: 'intro', label: 'Giới thiệu', icon: <Info size={15} /> },
     { id: 'news', label: 'Tin Tức', icon: <Newspaper size={15} /> },
     { id: 'documents', label: 'Văn bản', icon: <FileText size={15} /> },
+    { id: 'trolytinhoc', label: 'Trợ Lý Tin Học', icon: <Laptop size={15} /> },
     { id: 'albums', label: 'Albums', icon: <Image size={15} /> },
     { id: 'videos', label: 'Videos', icon: <Video size={15} /> },
     { id: 'resources', label: 'Tài nguyên', icon: <BookOpen size={15} /> },

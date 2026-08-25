@@ -21,6 +21,7 @@ import VideosView from './components/VideosView';
 import ResourcesView from './components/ResourcesView';
 import ScheduleView from './components/ScheduleView';
 import ContactView from './components/ContactView';
+import TrolyTinhocView from './components/TrolyTinhocView';
 import Footer from './components/Footer';
 import AIChatbotStudio from './components/AIChatbotStudio';
 import { supabase } from './lib/supabaseClient';
@@ -777,6 +778,11 @@ export default function App() {
         </div>
       ) : activeTab === 'intro' ? (
         <IntroView siteConfig={siteConfig} />
+      ) : activeTab === 'trolytinhoc' ? (
+        <TrolyTinhocView onOpenChatbot={() => {
+          const btn = document.querySelector('button[style*="pulseGlow"]');
+          if (btn) btn.click();
+        }} />
       ) : activeTab === 'albums' ? (
         <AlbumsView albums={albums} user={user} onUpdateAlbum={handleUpdateAlbum} onDeleteAlbum={handleDeleteAlbum} />
       ) : activeTab === 'videos' ? (

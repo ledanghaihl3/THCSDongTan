@@ -46,6 +46,20 @@ Em có thể giúp gì cho Thầy/Cô và các em hôm nay?`,
   const processAIQuery = (query) => {
     const q = query.toLowerCase().trim();
 
+    // 0. Hỏi về TROLYTINHOC / Tin Học / Lập trình / Excel / Python / Scratch
+    if (q.includes('trolytinhoc') || q.includes('tin học') || q.includes('lập trình') || q.includes('excel') || q.includes('python') || q.includes('scratch') || q.includes('code')) {
+      return {
+        text: `💻 **HỆ THỐNG TRỢ LÝ TIN HỌC (TROLYTINHOC) - THCS ĐỒNG TÂN:**\n\n` +
+              `Hệ thống TROLYTINHOC đã được tích hợp trực tiếp trên website nhà trường! Thầy/Cô và các em học sinh có thể:\n\n` +
+              `• **Lập trình Python:** Chạy thử code & kiểm tra lỗi tự động.\n` +
+              `• **Bảng tính Excel:** Nhập và kiểm tra công thức =SUM, =AVERAGE, =IF.\n` +
+              `• **Scratch & Web HTML:** Thực hành tạo kịch bản & giao diện web.\n` +
+              `• **Ngân hàng bài tập:** Kho bài tập thực hành chọn lọc từ Khối 6 đến Khối 9.`,
+        suggestions: ['💻 Mở Chuyên trang TROLYTINHOC', '🐍 Bài tập Python mẫu', '📊 Bài tập Excel chuẩn'],
+        actionTab: 'trolytinhoc'
+      };
+    }
+
     // 1. Hỏi về Ban Giám Hiệu / Hiệu Trưởng / Hiệu Phó
     if (q.includes('hiệu trưởng') || q.includes('hiệu phó') || q.includes('bgh') || q.includes('ban giám hiệu') || q.includes('lãnh đạo')) {
       const principal = siteConfig.principal || siteConfig.principalName || 'Thầy Hiệu Trưởng';
