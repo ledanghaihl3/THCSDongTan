@@ -22,6 +22,7 @@ import ResourcesView from './components/ResourcesView';
 import ScheduleView from './components/ScheduleView';
 import ContactView from './components/ContactView';
 import Footer from './components/Footer';
+import AIChatbotStudio from './components/AIChatbotStudio';
 import { supabase } from './lib/supabaseClient';
 
 // Initial Fallback Site Config
@@ -971,6 +972,19 @@ export default function App() {
         />
       )}
 
+
+      {/* AI Chatbot Studio Assistant Widget */}
+      <AIChatbotStudio 
+        siteConfig={siteConfig} 
+        newsList={newsList} 
+        documents={documents} 
+        schedules={schedules} 
+        resources={resources} 
+        onOpenTab={(tabKey) => {
+          setActiveTab(tabKey);
+          setSelectedCategory(null);
+        }}
+      />
 
       <Footer siteConfig={siteConfig} />
     </div>
