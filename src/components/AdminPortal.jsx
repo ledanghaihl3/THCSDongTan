@@ -203,16 +203,58 @@ export default function AdminPortal({
     setNewEmail('');
   };
 
+  const compressImage = (file, maxWidth = 600, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (file, setUrlCallback) => {
     if (!file) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setUrlCallback(e.target.result);
-      setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+    try {
+      if (file.type && file.type.startsWith('image/')) {
+        const compressedDataUrl = await compressImage(file, 600, 0.8);
+        setUrlCallback(compressedDataUrl);
+        setMessage(`✅ Đã tải và tối ưu hóa ảnh thành công: ${file.name}`);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setUrlCallback(e.target.result);
+          setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải file:', err);
+    } finally {
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveConfig = (e) => {

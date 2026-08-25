@@ -33,7 +33,22 @@ const INITIAL_SITE_CONFIG = {
   phone: '(0205) 3885.6789',
   email: 'thcsdongtan.huulung@langson.edu.vn',
   logoUrl: '/images/school-logo.jpg',
-  bannerBg: '/images/school-banner.png'
+  bannerBg: '/images/school-banner.png',
+  history: 'Trường THCS Đồng Tân được thành lập và phát triển trên địa bàn Xã Hữu Lũng, Tỉnh Lạng Sơn. Qua nhiều năm xây dựng và trưởng thành, nhà trường luôn phấn đấu đạt danh hiệu Trường học thân thiện, Học sinh tích cực, nâng cao chất lượng giáo dục toàn diện.',
+  mission: 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
+  vision: 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
+  principal: 'Thầy Hiệu Trưởng - THCS Đồng Tân',
+  principalAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
+  vicePrincipal: 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
+  vicePrincipalAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
+  teamLeader1: 'Thầy Tổ Trưởng Tổ Tự Nhiên',
+  teamLeader1Avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&q=80',
+  teamLeader2: 'Cô Tổ Trưởng Tổ Xã Hội',
+  teamLeader2Avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
+  teamLeader3: 'Thầy Chủ Tịch Công Đoàn',
+  teamLeader3Avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
+  teamLeader4: 'Cô Bí Thư Đoàn Đội',
+  teamLeader4Avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'
 };
 
 // Initial Fallback Data
@@ -327,15 +342,35 @@ export default function App() {
       }
 
       if (cfgData) {
-        setSiteConfig({
-          schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
-          governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
-          slogan: cfgData.slogan || INITIAL_SITE_CONFIG.slogan,
-          address: cfgData.address || INITIAL_SITE_CONFIG.address,
-          phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
-          email: cfgData.email || INITIAL_SITE_CONFIG.email,
-          logoUrl: cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl,
-          bannerBg: cfgData.banner_bg || INITIAL_SITE_CONFIG.bannerBg
+        setSiteConfig(prev => {
+          const merged = {
+            ...prev,
+            schoolName: cfgData.school_name || prev.schoolName || INITIAL_SITE_CONFIG.schoolName,
+            governingBody: cfgData.governing_body || prev.governingBody || INITIAL_SITE_CONFIG.governingBody,
+            slogan: cfgData.slogan || prev.slogan || INITIAL_SITE_CONFIG.slogan,
+            address: cfgData.address || prev.address || INITIAL_SITE_CONFIG.address,
+            phone: cfgData.phone || prev.phone || INITIAL_SITE_CONFIG.phone,
+            email: cfgData.email || prev.email || INITIAL_SITE_CONFIG.email,
+            logoUrl: cfgData.logo_url || prev.logoUrl || INITIAL_SITE_CONFIG.logoUrl,
+            bannerBg: cfgData.banner_bg || prev.bannerBg || INITIAL_SITE_CONFIG.bannerBg,
+            history: cfgData.history || prev.history || INITIAL_SITE_CONFIG.history,
+            mission: cfgData.mission || prev.mission || INITIAL_SITE_CONFIG.mission,
+            vision: cfgData.vision || prev.vision || INITIAL_SITE_CONFIG.vision,
+            principal: cfgData.principal || cfgData.principal_name || prev.principal || INITIAL_SITE_CONFIG.principal,
+            principalAvatar: cfgData.principal_avatar || cfgData.principalAvatar || prev.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar,
+            vicePrincipal: cfgData.vice_principal || cfgData.vicePrincipal || prev.vicePrincipal || INITIAL_SITE_CONFIG.vicePrincipal,
+            vicePrincipalAvatar: cfgData.vice_principal_avatar || cfgData.vicePrincipalAvatar || prev.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
+            teamLeader1: cfgData.team_leader_1 || prev.teamLeader1 || INITIAL_SITE_CONFIG.teamLeader1,
+            teamLeader1Avatar: cfgData.team_leader_1_avatar || prev.teamLeader1Avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
+            teamLeader2: cfgData.team_leader_2 || prev.teamLeader2 || INITIAL_SITE_CONFIG.teamLeader2,
+            teamLeader2Avatar: cfgData.team_leader_2_avatar || prev.teamLeader2Avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
+            teamLeader3: cfgData.team_leader_3 || prev.teamLeader3 || INITIAL_SITE_CONFIG.teamLeader3,
+            teamLeader3Avatar: cfgData.team_leader_3_avatar || prev.teamLeader3Avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
+            teamLeader4: cfgData.team_leader_4 || prev.teamLeader4 || INITIAL_SITE_CONFIG.teamLeader4,
+            teamLeader4Avatar: cfgData.team_leader_4_avatar || prev.teamLeader4Avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
+          };
+          localStorage.setItem('portal_site_config', JSON.stringify(merged));
+          return merged;
         });
       }
 
@@ -388,6 +423,7 @@ export default function App() {
 
   const handleSaveSiteConfig = async (newConfig) => {
     setSiteConfig(newConfig);
+    localStorage.setItem('portal_site_config', JSON.stringify(newConfig));
     if (supabase) {
       try {
         await supabase.from('site_config').upsert({
@@ -400,9 +436,26 @@ export default function App() {
           email: newConfig.email,
           logo_url: newConfig.logoUrl,
           banner_bg: newConfig.bannerBg,
+          history: newConfig.history,
+          mission: newConfig.mission,
+          vision: newConfig.vision,
+          principal: newConfig.principal,
+          principal_avatar: newConfig.principalAvatar,
+          vice_principal: newConfig.vicePrincipal,
+          vice_principal_avatar: newConfig.vicePrincipalAvatar,
+          team_leader_1: newConfig.teamLeader1,
+          team_leader_1_avatar: newConfig.teamLeader1Avatar,
+          team_leader_2: newConfig.teamLeader2,
+          team_leader_2_avatar: newConfig.teamLeader2Avatar,
+          team_leader_3: newConfig.teamLeader3,
+          team_leader_3_avatar: newConfig.teamLeader3Avatar,
+          team_leader_4: newConfig.teamLeader4,
+          team_leader_4_avatar: newConfig.teamLeader4Avatar,
           updated_at: new Date().toISOString()
         });
-      } catch (err) {}
+      } catch (err) {
+        console.error('Lỗi lưu site_config Supabase:', err);
+      }
     }
   };
 
