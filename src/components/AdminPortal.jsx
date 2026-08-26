@@ -24,8 +24,8 @@ export default function AdminPortal({
   onDeleteResource,
   onRefreshData 
 }) {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [adminTab, setAdminTab] = useState('users');
   const [message, setMessage] = useState('');
@@ -459,7 +459,7 @@ export default function AdminPortal({
               value={username} 
               onChange={(e) => setUsername(e.target.value)} 
               style={{ width: '100%', padding: '8px 10px', border: '1px solid #94a3b8', borderRadius: '4px' }}
-              placeholder="Nhập 'admin' hoặc 'giaovien'"
+              placeholder="Nhập tên tài khoản (BGH/Giáo viên)"
               required 
             />
           </div>
@@ -470,7 +470,7 @@ export default function AdminPortal({
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               style={{ width: '100%', padding: '8px 10px', border: '1px solid #94a3b8', borderRadius: '4px' }}
-              placeholder="Mật khẩu mặc định: admin123"
+              placeholder="Nhập mật khẩu"
               required 
             />
           </div>
