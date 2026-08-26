@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, LogOut, PlusCircle, FilePlus, Users, CheckCircle, Trash2, Edit, Settings, AlertCircle, Save, Check, UserCheck, Bell, UserPlus } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, uploadFileToSupabase, uploadBase64ToSupabase } from '../lib/supabaseClient';
 
 export default function AdminPortal({ 
   token, 
@@ -261,10 +261,17 @@ export default function AdminPortal({
         setMessage(`✅ Đã tải ảnh lên Supabase Cloud thành công: ${file.name}`);
       } else {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          setUrlCallback(e.target.result);
+        reader.onload = async (e) => {
+          const b64 = e.target.result;
+          setUrlCallback(b64);
           setIsConfigDirty(true);
-          setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+          const uploadedB64 = await uploadBase64ToSupabase(b64, 'uploads');
+          if (uploadedB64) {
+            setUrlCallback(uploadedB64);
+            setMessage(`✅ Đã tải và lưu trữ ảnh công khai lên Supabase Cloud thành công: ${file.name}`);
+          } else {
+            setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+          }
         };
         reader.readAsDataURL(file);
       }
@@ -282,76 +289,61 @@ export default function AdminPortal({
     setSavingConfig(true);
     setMessage('');
 
-    if (onSaveSiteConfig) {
-      onSaveSiteConfig(configState);
-    }
-
-    let isCloudSuccess = false;
-    if (supabase) {
-      try {
-        const sanitizeAvatar = (url, defaultUrl) => {
-          if (!url) return defaultUrl;
-          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
-            return url;
-          }
-          if (typeof url === 'string' && url.startsWith('data:image/')) return defaultUrl;
+    try {
+      const sanitizeAvatar = async (url, defaultUrl) => {
+        if (!url) return defaultUrl;
+        if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
           return url;
-        };
+        }
+        if (typeof url === 'string' && url.startsWith('data:image/')) {
+          const uploaded = await uploadBase64ToSupabase(url, 'uploads');
+          return uploaded || defaultUrl;
+        }
+        return url;
+      };
 
-        const bghPayload = {
-          principal: configState.principal,
-          principalAvatar: sanitizeAvatar(configState.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
-          vicePrincipal: configState.vicePrincipal,
-          vicePrincipalAvatar: sanitizeAvatar(configState.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
-          teamLeader1Name: configState.teamLeader1Name,
-          teamLeader1Title: configState.teamLeader1Title,
-          teamLeader1Avatar: sanitizeAvatar(configState.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
-          teamLeader2Name: configState.teamLeader2Name,
-          teamLeader2Title: configState.teamLeader2Title,
-          teamLeader2Avatar: sanitizeAvatar(configState.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
-          teamLeader3Name: configState.teamLeader3Name,
-          teamLeader3Title: configState.teamLeader3Title,
-          teamLeader3Avatar: sanitizeAvatar(configState.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
-          teamLeader4Name: configState.teamLeader4Name,
-          teamLeader4Title: configState.teamLeader4Title,
-          teamLeader4Avatar: sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
-        };
+      const bghPayload = {
+        principal: configState.principal,
+        principalAvatar: await sanitizeAvatar(configState.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+        vicePrincipal: configState.vicePrincipal,
+        vicePrincipalAvatar: await sanitizeAvatar(configState.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+        teamLeader1Name: configState.teamLeader1Name,
+        teamLeader1Title: configState.teamLeader1Title,
+        teamLeader1Avatar: await sanitizeAvatar(configState.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+        teamLeader2Name: configState.teamLeader2Name,
+        teamLeader2Title: configState.teamLeader2Title,
+        teamLeader2Avatar: await sanitizeAvatar(configState.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+        teamLeader3Name: configState.teamLeader3Name,
+        teamLeader3Title: configState.teamLeader3Title,
+        teamLeader3Avatar: await sanitizeAvatar(configState.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+        teamLeader4Name: configState.teamLeader4Name,
+        teamLeader4Title: configState.teamLeader4Title,
+        teamLeader4Avatar: await sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+      };
 
-        const cleanSlogan = (configState.slogan || '').split('|||BGH_JSON:')[0];
-        const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+      const updatedConfig = {
+        ...configState,
+        principalAvatar: bghPayload.principalAvatar,
+        vicePrincipalAvatar: bghPayload.vicePrincipalAvatar,
+        teamLeader1Avatar: bghPayload.teamLeader1Avatar,
+        teamLeader2Avatar: bghPayload.teamLeader2Avatar,
+        teamLeader3Avatar: bghPayload.teamLeader3Avatar,
+        teamLeader4Avatar: bghPayload.teamLeader4Avatar
+      };
 
-        const cleanLogoUrl = (configState.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
-        const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
-
-        const upsertData = {
-          id: 1,
-          school_name: configState.schoolName,
-          governing_body: configState.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
-          slogan: packedSlogan,
-          address: configState.address,
-          phone: configState.phone,
-          email: configState.email,
-          logo_url: packedLogoUrl,
-          banner_bg: configState.bannerBg || '/images/school-banner.png',
-          updated_at: new Date().toISOString()
-        };
-
-        const { error } = await supabase.from('site_config').upsert(upsertData);
-        if (!error) isCloudSuccess = true;
-      } catch (err) {
-        console.error('Lỗi lưu Supabase:', err);
-      } finally {
-        setSavingConfig(false);
-        setIsConfigDirty(false);
+      if (onSaveSiteConfig) {
+        await onSaveSiteConfig(updatedConfig);
       }
-    } else {
-      setSavingConfig(false);
-      setIsConfigDirty(false);
-    }
 
-    const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
-    setMessage(successMsg);
-    alert(successMsg);
+      setIsConfigDirty(false);
+      const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
+      setMessage(successMsg);
+      alert(successMsg);
+    } catch (err) {
+      console.error('Lỗi lưu cấu hình:', err);
+    } finally {
+      setSavingConfig(false);
+    }
   };
 
   const handleLoginSubmit = async (e) => {

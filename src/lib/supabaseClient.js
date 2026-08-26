@@ -30,4 +30,42 @@ export const uploadFileToSupabase = async (file, bucket = 'uploads') => {
   }
 };
 
+export const uploadBase64ToSupabase = async (base64Str, bucket = 'uploads') => {
+  if (!supabase || !base64Str || typeof base64Str !== 'string' || !base64Str.startsWith('data:image/')) {
+    return base64Str;
+  }
+  try {
+    const mimeMatch = base64Str.match(/^data:(image\/\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+    const fileExt = mimeType.split('/')[1] || 'png';
+    const base64Data = base64Str.replace(/^data:image\/\w+;base64,/, '');
+
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+
+    const fileName = `img_b64_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+    const { data, error } = await supabase.storage.from(bucket).upload(fileName, blob, {
+      contentType: mimeType,
+      upsert: true,
+      cacheControl: '3600'
+    });
+
+    if (error) {
+      console.error('Lỗi upload Base64 Supabase:', error);
+      return null;
+    }
+
+    const { data: publicUrlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
+    return publicUrlData?.publicUrl || null;
+  } catch (err) {
+    console.error('Lỗi upload Base64 Supabase Storage:', err);
+    return null;
+  }
+};
+
 
