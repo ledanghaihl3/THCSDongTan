@@ -6,38 +6,36 @@ export default function IntroView({ siteConfig, introData }) {
     history: siteConfig?.history || 'Trường THCS Đồng Tân được thành lập và phát triển trên địa bàn Xã Hữu Lũng, Tỉnh Lạng Sơn. Qua nhiều năm xây dựng và trưởng thành, nhà trường luôn phấn đấu đạt danh hiệu Trường học thân thiện, Học sinh tích cực, nâng cao chất lượng giáo dục toàn diện.',
     mission: siteConfig?.mission || 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
     vision: siteConfig?.vision || 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
-    principal: siteConfig?.principal || 'Thầy Hiệu Trưởng - THCS Đồng Tân',
-    principalAvatar: siteConfig?.principalAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
-    vicePrincipal: siteConfig?.vicePrincipal || 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
-    vicePrincipalAvatar: siteConfig?.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
-    
-    // 4 Tổ Trưởng Chuyên Môn
-    teamLeader1Name: siteConfig?.teamLeader1Name || 'Thầy Nguyễn Văn Nam',
-    teamLeader1Title: siteConfig?.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
-    teamLeader1Avatar: siteConfig?.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-    
-    teamLeader2Name: siteConfig?.teamLeader2Name || 'Cô Trần Thị Thu Hà',
-    teamLeader2Title: siteConfig?.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
-    teamLeader2Avatar: siteConfig?.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
-    
-    teamLeader3Name: siteConfig?.teamLeader3Name || 'Thầy Lê Hoàng Long',
-    teamLeader3Title: siteConfig?.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
-    teamLeader3Avatar: siteConfig?.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
-    
-    teamLeader4Name: siteConfig?.teamLeader4Name || 'Cô Phạm Phương Thảo',
-    teamLeader4Title: siteConfig?.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
-    teamLeader4Avatar: siteConfig?.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80',
-
     totalTeachers: siteConfig?.totalTeachers || 35,
     totalStudents: siteConfig?.totalStudents || 520,
     classes: siteConfig?.classes || 14
   };
+  const principal = siteConfig?.principal || 'Thầy Hiệu Trưởng - THCS Đồng Tân';
+  const principalAvatar = siteConfig?.principalAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80';
+  const vicePrincipal = siteConfig?.vicePrincipal || 'Cô Phó Hiệu Trưởng - THCS Đồng Tân';
+  const vicePrincipalAvatar = siteConfig?.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80';
 
   const teamLeaders = [
-    { name: intro.teamLeader1Name, title: intro.teamLeader1Title, avatar: intro.teamLeader1Avatar },
-    { name: intro.teamLeader2Name, title: intro.teamLeader2Title, avatar: intro.teamLeader2Avatar },
-    { name: intro.teamLeader3Name, title: intro.teamLeader3Title, avatar: intro.teamLeader3Avatar },
-    { name: intro.teamLeader4Name, title: intro.teamLeader4Title, avatar: intro.teamLeader4Avatar }
+    { 
+      name: siteConfig?.teamLeader1Name || siteConfig?.teamLeader1 || 'Thầy Nguyễn Văn Nam', 
+      title: siteConfig?.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN', 
+      avatar: siteConfig?.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader2Name || siteConfig?.teamLeader2 || 'Cô Trần Thị Thu Hà', 
+      title: siteConfig?.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH', 
+      avatar: siteConfig?.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader3Name || siteConfig?.teamLeader3 || 'Thầy Lê Hoàng Long', 
+      title: siteConfig?.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật', 
+      avatar: siteConfig?.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader4Name || siteConfig?.teamLeader4 || 'Cô Phạm Phương Thảo', 
+      title: siteConfig?.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể', 
+      avatar: siteConfig?.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80' 
+    }
   ];
 
   return (
@@ -99,13 +97,13 @@ export default function IntroView({ siteConfig, introData }) {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
-              <img src={intro.principalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} />
-              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{intro.principal}</h4>
+              <img src={principalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} />
+              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{principal}</h4>
               <span style={{ fontSize: '12.5px', color: '#0284c7', fontWeight: '700', background: '#e0f2fe', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Hiệu Trưởng Nhà Trường</span>
             </div>
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
-              <img src={intro.vicePrincipalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} />
-              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{intro.vicePrincipal}</h4>
+              <img src={vicePrincipalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} />
+              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{vicePrincipal}</h4>
               <span style={{ fontSize: '12.5px', color: '#16a34a', fontWeight: '700', background: '#dcfce7', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Phó Hiệu Trưởng Chuyên Môn</span>
             </div>
           </div>
