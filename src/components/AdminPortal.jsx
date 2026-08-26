@@ -294,19 +294,18 @@ export default function AdminPortal({
           teamLeader4Avatar: configState.teamLeader4Avatar
         };
 
-        const cleanSloganText = (configState.slogan || '').split('|||BGH_JSON:')[0];
-        const packedSlogan = cleanSloganText + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+        const cleanLogoUrl = (configState.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
+        const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
         const { error } = await supabase.from('site_config').upsert({
           id: 1,
           school_name: configState.schoolName,
-          governing_body: configState.governingBody,
-          slogan: packedSlogan,
+          slogan: configState.slogan,
           address: configState.address,
           phone: configState.phone,
           email: configState.email,
-          logo_url: configState.logoUrl,
-          banner_bg: configState.bannerBg,
+          logo_url: packedLogoUrl,
+          banner_url: configState.bannerBg || '/images/school-banner.png',
           updated_at: new Date().toISOString()
         });
         if (!error) isCloudSuccess = true;

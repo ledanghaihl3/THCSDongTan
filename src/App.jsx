@@ -349,13 +349,13 @@ export default function App() {
       }
 
       if (cfgData) {
-        let rawSlogan = cfgData.slogan || INITIAL_SITE_CONFIG.slogan;
-        let cleanSlogan = rawSlogan;
+        let rawLogoUrl = cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl;
+        let cleanLogoUrl = rawLogoUrl;
         let bghData = {};
 
-        if (rawSlogan && rawSlogan.includes('|||BGH_JSON:')) {
-          const parts = rawSlogan.split('|||BGH_JSON:');
-          cleanSlogan = parts[0];
+        if (rawLogoUrl && rawLogoUrl.includes('|||BGH_JSON:')) {
+          const parts = rawLogoUrl.split('|||BGH_JSON:');
+          cleanLogoUrl = parts[0];
           try {
             bghData = JSON.parse(parts[1]);
           } catch (e) {}
@@ -366,12 +366,12 @@ export default function App() {
             ...prev,
             schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
             governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
-            slogan: cleanSlogan,
+            slogan: cfgData.slogan || INITIAL_SITE_CONFIG.slogan,
             address: cfgData.address || INITIAL_SITE_CONFIG.address,
             phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
             email: cfgData.email || INITIAL_SITE_CONFIG.email,
-            logoUrl: cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl,
-            bannerBg: cfgData.banner_bg || INITIAL_SITE_CONFIG.bannerBg,
+            logoUrl: cleanLogoUrl,
+            bannerBg: cfgData.banner_url || cfgData.banner_bg || INITIAL_SITE_CONFIG.bannerBg,
             history: cfgData.history || INITIAL_SITE_CONFIG.history,
             mission: cfgData.mission || INITIAL_SITE_CONFIG.mission,
             vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
@@ -492,19 +492,18 @@ export default function App() {
           teamLeader4Avatar: newConfig.teamLeader4Avatar
         };
 
-        const cleanSloganText = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
-        const packedSlogan = cleanSloganText + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+        const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
+        const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
         await supabase.from('site_config').upsert({
           id: 1,
           school_name: newConfig.schoolName,
-          governing_body: newConfig.governingBody,
-          slogan: packedSlogan,
+          slogan: newConfig.slogan,
           address: newConfig.address,
           phone: newConfig.phone,
           email: newConfig.email,
-          logo_url: newConfig.logoUrl,
-          banner_bg: newConfig.bannerBg,
+          logo_url: packedLogoUrl,
+          banner_url: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
           updated_at: new Date().toISOString()
         });
       } catch (err) {
