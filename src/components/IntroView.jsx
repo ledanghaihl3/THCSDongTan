@@ -17,22 +17,22 @@ export default function IntroView({ siteConfig, introData }) {
 
   const teamLeaders = [
     { 
-      name: siteConfig?.teamLeader1Name || siteConfig?.teamLeader1 || 'Thầy Nguyễn Văn Nam', 
+      name: siteConfig?.teamLeader1Name || siteConfig?.teamLeader1 || 'Cô Nguyễn Thanh Mai', 
       title: siteConfig?.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN', 
       avatar: siteConfig?.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80' 
     },
     { 
-      name: siteConfig?.teamLeader2Name || siteConfig?.teamLeader2 || 'Cô Trần Thị Thu Hà', 
+      name: siteConfig?.teamLeader2Name || siteConfig?.teamLeader2 || 'Cô Đặng Thị Thảo', 
       title: siteConfig?.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH', 
       avatar: siteConfig?.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80' 
     },
     { 
-      name: siteConfig?.teamLeader3Name || siteConfig?.teamLeader3 || 'Thầy Lê Hoàng Long', 
+      name: siteConfig?.teamLeader3Name || siteConfig?.teamLeader3 || 'Cô Phạm Thị Hằng', 
       title: siteConfig?.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật', 
       avatar: siteConfig?.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80' 
     },
     { 
-      name: siteConfig?.teamLeader4Name || siteConfig?.teamLeader4 || 'Cô Phạm Phương Thảo', 
+      name: siteConfig?.teamLeader4Name || siteConfig?.teamLeader4 || 'Cô Hoàng Thị Chuyên', 
       title: siteConfig?.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể', 
       avatar: siteConfig?.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80' 
     }
@@ -99,8 +99,11 @@ export default function IntroView({ siteConfig, introData }) {
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
               <img 
                 src={principalAvatar} 
-                alt="BGH" 
-                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'; }}
+                alt="Hiệu Trưởng" 
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%230056a6"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                }}
                 style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} 
               />
               <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{principal}</h4>
@@ -109,8 +112,11 @@ export default function IntroView({ siteConfig, introData }) {
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
               <img 
                 src={vicePrincipalAvatar} 
-                alt="BGH" 
-                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'; }}
+                alt="Phó Hiệu Trưởng" 
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%2316a34a"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                }}
                 style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} 
               />
               <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{vicePrincipal}</h4>
@@ -120,15 +126,18 @@ export default function IntroView({ siteConfig, introData }) {
 
           {/* Các Tổ Trưởng Chuyên Môn (4 Tổ Trưởng) */}
           <h2 style={{ fontSize: '18px', color: '#003a73', marginBottom: '15px', borderBottom: '2px solid #0284c7', paddingBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UserCheck size={20} /> CÁC TỔ TRƯỞNG CHUYÊN MÔN (4 TỔ TRƯỞNG)
+            <UserCheck size={20} /> CÁC TỔ TRƯỜNG CHUYÊN MÔN (4 TỔ TRƯỜNG)
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
             {teamLeaders.map((leader, index) => (
               <div key={index} style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#f8fafc', transition: 'transform 0.2s ease' }}>
                 <img 
-                  src={leader.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'} 
+                  src={leader.avatar || '/images/school-logo.jpg'} 
                   alt={leader.name} 
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'; }}
+                  onError={(e) => { 
+                    e.target.onerror = null; 
+                    e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%23d97706"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                  }}
                   style={{ width: '75px', height: '75px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '2px solid #d97706' }} 
                 />
                 <h4 style={{ fontSize: '14px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{leader.name}</h4>
@@ -144,4 +153,3 @@ export default function IntroView({ siteConfig, introData }) {
     </div>
   );
 }
-
