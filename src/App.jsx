@@ -350,7 +350,7 @@ export default function App() {
             schoolName: cfgData.school_name || prev.schoolName || INITIAL_SITE_CONFIG.schoolName,
             governingBody: cfgData.governing_body || prev.governingBody || INITIAL_SITE_CONFIG.governingBody,
             slogan: cfgData.slogan || prev.slogan || INITIAL_SITE_CONFIG.slogan,
-            address: cfgData.address || prev.address || INITIAL_SITE_CONFIG.address,
+            address: cfgData.address || INITIAL_SITE_CONFIG.address,
             phone: cfgData.phone || prev.phone || INITIAL_SITE_CONFIG.phone,
             email: cfgData.email || prev.email || INITIAL_SITE_CONFIG.email,
             logoUrl: cfgData.logo_url || prev.logoUrl || INITIAL_SITE_CONFIG.logoUrl,
