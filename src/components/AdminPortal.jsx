@@ -66,9 +66,16 @@ export default function AdminPortal({
     teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
   });
 
-  // Keep configState updated when siteConfig prop changes from Supabase sync
+  const [isConfigDirty, setIsConfigDirty] = useState(false);
+
+  const updateConfigField = (field, value) => {
+    setIsConfigDirty(true);
+    setConfigState(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Keep configState updated when siteConfig prop changes from Supabase sync ONLY if user is not currently editing
   useEffect(() => {
-    if (siteConfig && siteConfig.schoolName) {
+    if (!isConfigDirty && siteConfig && siteConfig.schoolName) {
       let addr = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
       if (!addr || addr.includes('Thôn Đồng Tân') || addr.includes('Xã Đồng Tân')) {
         addr = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
@@ -100,7 +107,7 @@ export default function AdminPortal({
         teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
       });
     }
-  }, [siteConfig]);
+  }, [siteConfig, isConfigDirty]);
 
   // User Management State
   const [userList, setUserList] = useState([]);
@@ -309,6 +316,7 @@ export default function AdminPortal({
     }
 
     setSavingConfig(false);
+    setIsConfigDirty(false);
     const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
     setMessage(successMsg);
     alert(successMsg);
@@ -769,41 +777,41 @@ export default function AdminPortal({
           <h3 style={{ fontSize: '16px', color: '#003a73', fontWeight: '700' }}>⚙️ CHỈNH SỬA THÔNG TIN BANNER & TRƯỜNG HỌC (ĐỒNG BỘ MỌI THIẾT BỊ)</h3>
           <div>
             <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Tên Trường (*):</label>
-            <input type="text" value={configState.schoolName} onChange={(e) => setConfigState({...configState, schoolName: e.target.value})} required style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+            <input type="text" value={configState.schoolName} onChange={(e) => updateConfigField('schoolName', e.target.value)} required style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
           </div>
           <div>
             <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Cơ quan Quản lý / Chủ quản:</label>
-            <input type="text" value={configState.governingBody} onChange={(e) => setConfigState({...configState, governingBody: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+            <input type="text" value={configState.governingBody} onChange={(e) => updateConfigField('governingBody', e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
           </div>
           <div>
             <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Khẩu hiệu (Slogan):</label>
-            <input type="text" value={configState.slogan} onChange={(e) => setConfigState({...configState, slogan: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+            <input type="text" value={configState.slogan} onChange={(e) => updateConfigField('slogan', e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Số điện thoại liên hệ:</label>
-              <input type="text" value={configState.phone} onChange={(e) => setConfigState({...configState, phone: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+              <input type="text" value={configState.phone} onChange={(e) => updateConfigField('phone', e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
             </div>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Email chính thức:</label>
-              <input type="email" value={configState.email} onChange={(e) => setConfigState({...configState, email: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+              <input type="email" value={configState.email} onChange={(e) => updateConfigField('email', e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
             </div>
           </div>
           <div>
             <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Địa chỉ trường học:</label>
-            <input type="text" value={configState.address} onChange={(e) => setConfigState({...configState, address: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
+            <input type="text" value={configState.address} onChange={(e) => updateConfigField('address', e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '4px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', background: '#f8fafc', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Logo Trường (URL / Upload):</label>
-              <input type="text" value={configState.logoUrl} onChange={(e) => setConfigState({...configState, logoUrl: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }} />
-              <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, logoUrl: url}))} />
+              <input type="text" value={configState.logoUrl} onChange={(e) => updateConfigField('logoUrl', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }} />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('logoUrl', url))} />
             </div>
             <div>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '4px' }}>Ảnh Background Banner Header:</label>
-              <input type="text" value={configState.bannerBg} onChange={(e) => setConfigState({...configState, bannerBg: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }} />
-              <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, bannerBg: url}))} />
+              <input type="text" value={configState.bannerBg} onChange={(e) => updateConfigField('bannerBg', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }} />
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('bannerBg', url))} />
             </div>
           </div>
 
@@ -817,12 +825,12 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '4px' }}>Họ tên Thầy/Cô Hiệu Trưởng:</label>
-                <input type="text" value={configState.principal} onChange={(e) => setConfigState({...configState, principal: e.target.value})} style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="VD: Thầy Hiệu Trưởng - THCS Đồng Tân" />
+                <input type="text" value={configState.principal} onChange={(e) => updateConfigField('principal', e.target.value)} style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="VD: Thầy Hiệu Trưởng - THCS Đồng Tân" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '4px' }}>Ảnh chân dung Hiệu Trưởng (URL/File Upload):</label>
-                <input type="text" value={configState.principalAvatar} onChange={(e) => setConfigState({...configState, principalAvatar: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '4px' }} placeholder="Link URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, principalAvatar: url}))} />
+                <input type="text" value={configState.principalAvatar} onChange={(e) => updateConfigField('principalAvatar', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '4px' }} placeholder="Link URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('principalAvatar', url))} />
               </div>
             </div>
 
@@ -830,12 +838,12 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '4px' }}>Họ tên Thầy/Cô Phó Hiệu Trưởng:</label>
-                <input type="text" value={configState.vicePrincipal} onChange={(e) => setConfigState({...configState, vicePrincipal: e.target.value})} style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="VD: Cô Phó Hiệu Trưởng - THCS Đồng Tân" />
+                <input type="text" value={configState.vicePrincipal} onChange={(e) => updateConfigField('vicePrincipal', e.target.value)} style={{ width: '100%', padding: '7px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="VD: Cô Phó Hiệu Trưởng - THCS Đồng Tân" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '4px' }}>Ảnh chân dung Phó Hiệu Trưởng (URL/File Upload):</label>
-                <input type="text" value={configState.vicePrincipalAvatar} onChange={(e) => setConfigState({...configState, vicePrincipalAvatar: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '4px' }} placeholder="Link URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, vicePrincipalAvatar: url}))} />
+                <input type="text" value={configState.vicePrincipalAvatar} onChange={(e) => updateConfigField('vicePrincipalAvatar', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '4px' }} placeholder="Link URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('vicePrincipalAvatar', url))} />
               </div>
             </div>
           </div>
@@ -850,16 +858,16 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 1:</label>
-                <input type="text" value={configState.teamLeader1Name} onChange={(e) => setConfigState({...configState, teamLeader1Name: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Nguyễn Văn Nam" />
+                <input type="text" value={configState.teamLeader1Name} onChange={(e) => updateConfigField('teamLeader1Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Nguyễn Văn Nam" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
-                <input type="text" value={configState.teamLeader1Title} onChange={(e) => setConfigState({...configState, teamLeader1Title: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Toán - KHTN" />
+                <input type="text" value={configState.teamLeader1Title} onChange={(e) => updateConfigField('teamLeader1Title', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Toán - KHTN" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Ảnh chân dung (URL/File):</label>
-                <input type="text" value={configState.teamLeader1Avatar} onChange={(e) => setConfigState({...configState, teamLeader1Avatar: e.target.value})} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, teamLeader1Avatar: url}))} />
+                <input type="text" value={configState.teamLeader1Avatar} onChange={(e) => updateConfigField('teamLeader1Avatar', e.target.value)} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('teamLeader1Avatar', url))} />
               </div>
             </div>
 
@@ -867,16 +875,16 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 2:</label>
-                <input type="text" value={configState.teamLeader2Name} onChange={(e) => setConfigState({...configState, teamLeader2Name: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Trần Thị Thu Hà" />
+                <input type="text" value={configState.teamLeader2Name} onChange={(e) => updateConfigField('teamLeader2Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Trần Thị Thu Hà" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
-                <input type="text" value={configState.teamLeader2Title} onChange={(e) => setConfigState({...configState, teamLeader2Title: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Văn - KHXH" />
+                <input type="text" value={configState.teamLeader2Title} onChange={(e) => updateConfigField('teamLeader2Title', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Văn - KHXH" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Ảnh chân dung (URL/File):</label>
-                <input type="text" value={configState.teamLeader2Avatar} onChange={(e) => setConfigState({...configState, teamLeader2Avatar: e.target.value})} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, teamLeader2Avatar: url}))} />
+                <input type="text" value={configState.teamLeader2Avatar} onChange={(e) => updateConfigField('teamLeader2Avatar', e.target.value)} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('teamLeader2Avatar', url))} />
               </div>
             </div>
 
@@ -884,16 +892,16 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 3:</label>
-                <input type="text" value={configState.teamLeader3Name} onChange={(e) => setConfigState({...configState, teamLeader3Name: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Lê Hoàng Long" />
+                <input type="text" value={configState.teamLeader3Name} onChange={(e) => updateConfigField('teamLeader3Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Lê Hoàng Long" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
-                <input type="text" value={configState.teamLeader3Title} onChange={(e) => setConfigState({...configState, teamLeader3Title: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật" />
+                <input type="text" value={configState.teamLeader3Title} onChange={(e) => updateConfigField('teamLeader3Title', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Ảnh chân dung (URL/File):</label>
-                <input type="text" value={configState.teamLeader3Avatar} onChange={(e) => setConfigState({...configState, teamLeader3Avatar: e.target.value})} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, teamLeader3Avatar: url}))} />
+                <input type="text" value={configState.teamLeader3Avatar} onChange={(e) => updateConfigField('teamLeader3Avatar', e.target.value)} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('teamLeader3Avatar', url))} />
               </div>
             </div>
 
@@ -901,16 +909,16 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 4:</label>
-                <input type="text" value={configState.teamLeader4Name} onChange={(e) => setConfigState({...configState, teamLeader4Name: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Phạm Phương Thảo" />
+                <input type="text" value={configState.teamLeader4Name} onChange={(e) => updateConfigField('teamLeader4Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Phạm Phương Thảo" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
-                <input type="text" value={configState.teamLeader4Title} onChange={(e) => setConfigState({...configState, teamLeader4Title: e.target.value})} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Hành Chính - Văn Thể" />
+                <input type="text" value={configState.teamLeader4Title} onChange={(e) => updateConfigField('teamLeader4Title', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Tổ trưởng Tổ Hành Chính - Văn Thể" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Ảnh chân dung (URL/File):</label>
-                <input type="text" value={configState.teamLeader4Avatar} onChange={(e) => setConfigState({...configState, teamLeader4Avatar: e.target.value})} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
-                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => setConfigState({...configState, teamLeader4Avatar: url}))} />
+                <input type="text" value={configState.teamLeader4Avatar} onChange={(e) => updateConfigField('teamLeader4Avatar', e.target.value)} style={{ width: '100%', padding: '5px', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '3px' }} placeholder="URL ảnh" />
+                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files[0], (url) => updateConfigField('teamLeader4Avatar', url))} />
               </div>
             </div>
           </div>
