@@ -419,8 +419,26 @@ export default function App() {
 
   useEffect(() => {
     fetchCloudData();
-    const interval = setInterval(fetchCloudData, 10000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchCloudData, 4000);
+
+    let channel;
+    if (supabase) {
+      try {
+        channel = supabase
+          .channel('public_db_changes')
+          .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+            fetchCloudData();
+          })
+          .subscribe();
+      } catch (err) {}
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (supabase && channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   const handleSaveSiteConfig = async (newConfig) => {
