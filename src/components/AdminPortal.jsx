@@ -49,19 +49,19 @@ export default function AdminPortal({
     vicePrincipalAvatar: siteConfig.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
 
     // 4 Tổ Trưởng Chuyên Môn
-    teamLeader1Name: siteConfig.teamLeader1Name || siteConfig.teamLeader1 || 'Thầy Nguyễn Văn Nam',
+    teamLeader1Name: siteConfig.teamLeader1Name || 'Cô Nguyễn Thanh Mai',
     teamLeader1Title: siteConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
     teamLeader1Avatar: siteConfig.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
 
-    teamLeader2Name: siteConfig.teamLeader2Name || siteConfig.teamLeader2 || 'Cô Trần Thị Thu Hà',
+    teamLeader2Name: siteConfig.teamLeader2Name || 'Cô Đặng Thị Thảo',
     teamLeader2Title: siteConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
     teamLeader2Avatar: siteConfig.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
 
-    teamLeader3Name: siteConfig.teamLeader3Name || siteConfig.teamLeader3 || 'Thầy Lê Hoàng Long',
+    teamLeader3Name: siteConfig.teamLeader3Name || 'Cô Phạm Thị Hằng',
     teamLeader3Title: siteConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
     teamLeader3Avatar: siteConfig.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
 
-    teamLeader4Name: siteConfig.teamLeader4Name || siteConfig.teamLeader4 || 'Cô Phạm Phương Thảo',
+    teamLeader4Name: siteConfig.teamLeader4Name || 'Cô Hoàng Thị Chuyên',
     teamLeader4Title: siteConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
     teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
   });
@@ -93,16 +93,16 @@ export default function AdminPortal({
         principalAvatar: siteConfig.principalAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
         vicePrincipal: siteConfig.vicePrincipal || 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
         vicePrincipalAvatar: siteConfig.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
-        teamLeader1Name: siteConfig.teamLeader1Name || siteConfig.teamLeader1 || 'Thầy Nguyễn Văn Nam',
+        teamLeader1Name: siteConfig.teamLeader1Name || 'Cô Nguyễn Thanh Mai',
         teamLeader1Title: siteConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
         teamLeader1Avatar: siteConfig.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-        teamLeader2Name: siteConfig.teamLeader2Name || siteConfig.teamLeader2 || 'Cô Trần Thị Thu Hà',
+        teamLeader2Name: siteConfig.teamLeader2Name || 'Cô Đặng Thị Thảo',
         teamLeader2Title: siteConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
         teamLeader2Avatar: siteConfig.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
-        teamLeader3Name: siteConfig.teamLeader3Name || siteConfig.teamLeader3 || 'Thầy Lê Hoàng Long',
+        teamLeader3Name: siteConfig.teamLeader3Name || 'Cô Phạm Thị Hằng',
         teamLeader3Title: siteConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
         teamLeader3Avatar: siteConfig.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
-        teamLeader4Name: siteConfig.teamLeader4Name || siteConfig.teamLeader4 || 'Cô Phạm Phương Thảo',
+        teamLeader4Name: siteConfig.teamLeader4Name || 'Cô Hoàng Thị Chuyên',
         teamLeader4Title: siteConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
         teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
       });
