@@ -157,7 +157,12 @@ export default function App() {
   // Global Dynamic Site State with LocalStorage Persistence for Offline Reliability
   const [siteConfig, setSiteConfig] = useState(() => {
     const saved = localStorage.getItem('portal_site_config');
-    return saved ? JSON.parse(saved) : INITIAL_SITE_CONFIG;
+    let parsed = saved ? JSON.parse(saved) : INITIAL_SITE_CONFIG;
+    if (parsed && (parsed.address?.includes('Thôn Đồng Tân') || parsed.address?.includes('Xã Đồng Tân') || !parsed.address)) {
+      parsed.address = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+      localStorage.setItem('portal_site_config', JSON.stringify(parsed));
+    }
+    return parsed;
   });
 
   const [newsList, setNewsList] = useState(() => {

@@ -9,6 +9,10 @@ export default function Footer({ siteConfig, quickLinks = [], onSelectTab }) {
     phone: '(0205) 3885.6789',
     email: 'thcsdongtan.huulung@langson.edu.vn'
   };
+  let address = config.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  if (!address || address.includes('Thôn Đồng Tân') || address.includes('Xã Đồng Tân')) {
+    address = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  }
 
   // 1. Quản lý Thống kê truy cập thời gian thực (Live Real-time Visitors Counter)
   const [onlineCount, setOnlineCount] = useState(48);
@@ -88,7 +92,7 @@ export default function Footer({ siteConfig, quickLinks = [], onSelectTab }) {
           </h3>
           <p style={{ margin: '4px 0', fontSize: '13.5px', color: '#f8fafc', fontWeight: '700' }}>{config.governingBody}</p>
           <p style={{ margin: '4px 0', fontSize: '14px', color: '#38bdf8', fontWeight: '800' }}>{config.schoolName}</p>
-          <p style={{ margin: '4px 0', fontSize: '12.5px', color: '#cbd5e1' }}>📍 Địa chỉ: {config.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn'}</p>
+          <p style={{ margin: '4px 0', fontSize: '12.5px', color: '#cbd5e1' }}>📍 Địa chỉ: {address}</p>
           <p style={{ margin: '4px 0', fontSize: '12.5px', color: '#cbd5e1' }}>📞 Điện thoại: {config.phone}</p>
           <p style={{ margin: '4px 0', fontSize: '12.5px', color: '#cbd5e1' }}>✉️ Email: {config.email}</p>
         </div>
@@ -163,7 +167,7 @@ export default function Footer({ siteConfig, quickLinks = [], onSelectTab }) {
       </div>
 
       <div className="footer-bottom" style={{ textAlign: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)', marginTop: '25px', paddingTop: '12px', fontSize: '12.5px', color: '#94a3b8' }}>
-        Bản quyền © 2026 {config.schoolName} - {config.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn'}. Tất cả quyền được bảo lưu.
+        Bản quyền © 2026 {config.schoolName} - {address}. Tất cả quyền được bảo lưu.
       </div>
     </footer>
   );

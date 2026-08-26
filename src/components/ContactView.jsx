@@ -10,7 +10,10 @@ export default function ContactView({ siteConfig = {} }) {
 
   const schoolName = siteConfig.schoolName || 'TRƯỜNG THCS ĐỒNG TÂN';
   const governingBody = siteConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN';
-  const address = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  let address = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  if (!address || address.includes('Thôn Đồng Tân') || address.includes('Xã Đồng Tân')) {
+    address = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  }
   const phoneNumber = siteConfig.phone || '(0205) 3885.6789';
   const emailAddr = siteConfig.email || 'thcsdongtan.huulung@langson.edu.vn';
 
