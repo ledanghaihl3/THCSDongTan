@@ -24,7 +24,7 @@ import ContactView from './components/ContactView';
 import TrolyTinhocView from './components/TrolyTinhocView';
 import Footer from './components/Footer';
 import AIChatbotStudio from './components/AIChatbotStudio';
-import { supabase, uploadBase64ToSupabase } from './lib/supabaseClient';
+import { supabase, uploadBase64ToSupabase, saveSiteConfigToSupabase } from './lib/supabaseClient';
 
 // Initial Fallback Site Config
 const INITIAL_SITE_CONFIG = {
@@ -489,68 +489,37 @@ export default function App() {
     setSiteConfig(newConfig);
     localStorage.setItem('portal_site_config', JSON.stringify(newConfig));
 
-    if (supabase) {
-      try {
-        const sanitizeAvatar = async (url, defaultUrl) => {
-          if (!url) return defaultUrl;
-          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image/'))) {
-            return url;
-          }
-          return defaultUrl;
-        };
+    try {
+      const sanitizeAvatar = (url, defaultUrl) => {
+        if (!url) return defaultUrl;
+        if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image/'))) {
+          return url;
+        }
+        return defaultUrl;
+      };
 
-        const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
-          sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
-          sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
-          sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
-          sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
-          sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
-          sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
-        ]);
+      const bghPayload = {
+        principal: newConfig.principal,
+        principalAvatar: sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+        vicePrincipal: newConfig.vicePrincipal,
+        vicePrincipalAvatar: sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+        teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1 || 'Cô Nguyễn Thanh Mai',
+        teamLeader1Title: newConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
+        teamLeader1Avatar: sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+        teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2 || 'Cô Đặng Thị Thảo',
+        teamLeader2Title: newConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
+        teamLeader2Avatar: sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+        teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3 || 'Cô Phạm Thị Hằng',
+        teamLeader3Title: newConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
+        teamLeader3Avatar: sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+        teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4 || 'Cô Hoàng Thị Chuyên',
+        teamLeader4Title: newConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
+        teamLeader4Avatar: sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+      };
 
-        const bghPayload = {
-          principal: newConfig.principal,
-          principalAvatar: pAv,
-          vicePrincipal: newConfig.vicePrincipal,
-          vicePrincipalAvatar: vpAv,
-          teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1,
-          teamLeader1Title: newConfig.teamLeader1Title,
-          teamLeader1Avatar: t1Av,
-          teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2,
-          teamLeader2Title: newConfig.teamLeader2Title,
-          teamLeader2Avatar: t2Av,
-          teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3,
-          teamLeader3Title: newConfig.teamLeader3Title,
-          teamLeader3Avatar: t3Av,
-          teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4,
-          teamLeader4Title: newConfig.teamLeader4Title,
-          teamLeader4Avatar: t4Av
-        };
-
-        const cleanSlogan = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
-        const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
-
-        const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
-        const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
-
-        const upsertPromise = supabase.from('site_config').upsert({
-          id: 1,
-          school_name: newConfig.schoolName,
-          governing_body: newConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
-          slogan: packedSlogan,
-          address: newConfig.address,
-          phone: newConfig.phone,
-          email: newConfig.email,
-          logo_url: packedLogoUrl,
-          banner_bg: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
-          updated_at: new Date().toISOString()
-        });
-
-        const dbTimeout = new Promise(resolve => setTimeout(() => resolve({ error: 'Timeout' }), 3500));
-        await Promise.race([upsertPromise, dbTimeout]);
-      } catch (err) {
-        console.error('Lỗi lưu site_config Supabase:', err);
-      }
+      await saveSiteConfigToSupabase(newConfig, bghPayload);
+    } catch (err) {
+      console.error('Lỗi lưu site_config Supabase:', err);
     }
   };
 

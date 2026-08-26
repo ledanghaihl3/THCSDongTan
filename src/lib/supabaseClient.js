@@ -77,3 +77,41 @@ export const uploadBase64ToSupabase = async (base64Str, bucket = 'uploads') => {
     return null;
   }
 };
+
+// Save site_config row 1 directly to Supabase PostgREST Cloud API using active Service Role Key
+export const saveSiteConfigToSupabase = async (newConfig, bghPayload) => {
+  try {
+    const cleanSlogan = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
+    const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
+    const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
+    const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({
+        id: 1,
+        school_name: newConfig.schoolName,
+        governing_body: newConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
+        slogan: packedSlogan,
+        address: newConfig.address,
+        phone: newConfig.phone,
+        email: newConfig.email,
+        logo_url: packedLogoUrl,
+        banner_bg: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
+        updated_at: new Date().toISOString()
+      })
+    });
+
+    return response.ok || response.status === 200 || response.status === 201 || response.status === 204;
+  } catch (err) {
+    console.error('Lỗi saveSiteConfigToSupabase:', err);
+    return false;
+  }
+};
