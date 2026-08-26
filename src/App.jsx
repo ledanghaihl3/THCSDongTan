@@ -40,25 +40,25 @@ const INITIAL_SITE_CONFIG = {
   mission: 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
   vision: 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
   principal: 'Thầy Hiệu Trưởng - THCS Đồng Tân',
-  principalAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
+  principalAvatar: '/images/school-logo.jpg',
   vicePrincipal: 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
-  vicePrincipalAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
+  vicePrincipalAvatar: '/images/school-logo.jpg',
 
   teamLeader1Name: 'Cô Nguyễn Thanh Mai',
   teamLeader1Title: 'Tổ trưởng Tổ Toán - KHTN',
-  teamLeader1Avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
+  teamLeader1Avatar: '/images/school-logo.jpg',
 
   teamLeader2Name: 'Cô Đặng Thị Thảo',
   teamLeader2Title: 'Tổ trưởng Tổ Văn - KHXH',
-  teamLeader2Avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
+  teamLeader2Avatar: '/images/school-logo.jpg',
 
   teamLeader3Name: 'Cô Phạm Thị Hằng',
   teamLeader3Title: 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
-  teamLeader3Avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+  teamLeader3Avatar: '/images/school-logo.jpg',
 
   teamLeader4Name: 'Cô Hoàng Thị Chuyên',
   teamLeader4Title: 'Tổ trưởng Tổ Hành Chính - Văn Thể',
-  teamLeader4Avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
+  teamLeader4Avatar: '/images/school-logo.jpg'
 };
 
 // Initial Fallback Data
@@ -249,6 +249,22 @@ export default function App() {
     if (!supabase) return;
 
     try {
+      const fetchSiteConfigDirect = async () => {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+            headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (rows && rows.length > 0) return rows[0];
+          }
+        } catch (e) {}
+        return null;
+      };
+
       const [
         { data: artData },
         { data: docData },
@@ -256,7 +272,7 @@ export default function App() {
         { data: vidData },
         { data: albData },
         { data: schData },
-        { data: cfgData },
+        cfgData,
         { data: usrData }
       ] = await Promise.all([
         supabase.from('articles').select('*').order('id', { ascending: false }),
@@ -265,7 +281,7 @@ export default function App() {
         supabase.from('videos').select('*').order('id', { ascending: false }),
         supabase.from('albums').select('*').order('id', { ascending: false }),
         supabase.from('schedules').select('*').order('id', { ascending: false }),
-        supabase.from('site_config').select('*').eq('id', 1).maybeSingle(),
+        fetchSiteConfigDirect(),
         supabase.from('users').select('*').order('id', { ascending: false })
       ]);
 
