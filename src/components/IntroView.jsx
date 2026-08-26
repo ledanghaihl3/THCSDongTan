@@ -97,12 +97,22 @@ export default function IntroView({ siteConfig, introData }) {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
-              <img src={principalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} />
+              <img 
+                src={principalAvatar} 
+                alt="BGH" 
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'; }}
+                style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} 
+              />
               <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{principal}</h4>
               <span style={{ fontSize: '12.5px', color: '#0284c7', fontWeight: '700', background: '#e0f2fe', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Hiệu Trưởng Nhà Trường</span>
             </div>
             <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
-              <img src={vicePrincipalAvatar} alt="BGH" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} />
+              <img 
+                src={vicePrincipalAvatar} 
+                alt="BGH" 
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'; }}
+                style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} 
+              />
               <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{vicePrincipal}</h4>
               <span style={{ fontSize: '12.5px', color: '#16a34a', fontWeight: '700', background: '#dcfce7', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Phó Hiệu Trưởng Chuyên Môn</span>
             </div>
@@ -118,6 +128,7 @@ export default function IntroView({ siteConfig, introData }) {
                 <img 
                   src={leader.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'} 
                   alt={leader.name} 
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'; }}
                   style={{ width: '75px', height: '75px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '2px solid #d97706' }} 
                 />
                 <h4 style={{ fontSize: '14px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{leader.name}</h4>
