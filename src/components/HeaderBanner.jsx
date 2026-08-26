@@ -5,7 +5,7 @@ export default function HeaderBanner({ siteConfig }) {
   const schoolName = config.schoolName || 'TRƯỜNG THCS ĐỒNG TÂN';
   const governingBody = config.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN';
   const slogan = config.slogan || 'HỘI TỤ - KẾT TINH - TỎA SÁNG';
-  const address = config.address || 'Xã Hữu Lũng - Tỉnh Lạng Sơn';
+  const address = config.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
   const phone = config.phone || '(0205) 3885.6789';
   
   // Official school logo and background

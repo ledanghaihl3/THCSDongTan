@@ -31,7 +31,7 @@ const INITIAL_SITE_CONFIG = {
   schoolName: 'TRƯỜNG THCS ĐỒNG TÂN',
   governingBody: 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
   slogan: 'HỘI TỤ - KẾT TINH - TỎA SÁNG',
-  address: 'Xã Hữu Lũng - Tỉnh Lạng Sơn',
+  address: 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn',
   phone: '(0205) 3885.6789',
   email: 'thcsdongtan.huulung@langson.edu.vn',
   logoUrl: '/images/school-logo.jpg',

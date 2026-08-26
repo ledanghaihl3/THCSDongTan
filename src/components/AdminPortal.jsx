@@ -36,7 +36,7 @@ export default function AdminPortal({
     schoolName: siteConfig.schoolName || 'TRƯỜNG THCS ĐỒNG TÂN',
     governingBody: siteConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
     slogan: siteConfig.slogan || 'HỘI TỤ - KẾT TINH - TỎA SÁNG',
-    address: siteConfig.address || 'Xã Hữu Lũng - Tỉnh Lạng Sơn',
+    address: siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn',
     phone: siteConfig.phone || '(0205) 3885.6789',
     email: siteConfig.email || 'thcsdongtan.huulung@langson.edu.vn',
     logoUrl: siteConfig.logoUrl || '/images/school-logo.jpg',

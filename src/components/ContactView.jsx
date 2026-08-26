@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
 
-export default function ContactView() {
+export default function ContactView({ siteConfig = {} }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [content, setContent] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const schoolName = siteConfig.schoolName || 'TRƯỜNG THCS ĐỒNG TÂN';
+  const governingBody = siteConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN';
+  const address = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  const phoneNumber = siteConfig.phone || '(0205) 3885.6789';
+  const emailAddr = siteConfig.email || 'thcsdongtan.huulung@langson.edu.vn';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,7 +28,7 @@ export default function ContactView() {
       <div className="widget-box">
         <div className="widget-header green">
           <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Mail size={18} /> THÔNG TIN LIÊN HỆ & GỬI Ý KIẾN ĐÓNG GÓP - THCS ĐỒNG TÂN
+            <Mail size={18} /> THÔNG TIN LIÊN HỆ & GỬI Ý KIẾN ĐÓNG GÓP - {schoolName}
           </span>
         </div>
         <div className="widget-body" style={{ padding: '20px' }}>
@@ -34,22 +40,22 @@ export default function ContactView() {
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13.5px', color: '#334155' }}>
                 <div>
-                  <strong>🏫 Tên đơn vị:</strong> TRƯỜNG THCS ĐỒNG TÂN
+                  <strong>🏫 Tên đơn vị:</strong> {schoolName}
                 </div>
                 <div>
-                  <strong>📍 Địa chỉ:</strong> Xã Hữu Lũng, Tỉnh Lạng Sơn.
+                  <strong>📍 Địa chỉ:</strong> {address}
                 </div>
                 <div>
-                  <strong>🏛️ Cơ quan chủ quản:</strong> Xã Hữu Lũng - Tỉnh Lạng Sơn.
+                  <strong>🏛️ Cơ quan chủ quản:</strong> {governingBody}
                 </div>
                 <div>
-                  <strong>📞 Điện thoại BGH:</strong> (0205) 3885.6789
+                  <strong>📞 Điện thoại BGH:</strong> {phoneNumber}
                 </div>
                 <div>
-                  <strong>✉️ Email thư điện tử:</strong> thcsdongtan.huulung@langson.edu.vn
+                  <strong>✉️ Email thư điện tử:</strong> {emailAddr}
                 </div>
                 <div>
-                  <strong>🌐 Trưởng Ban Biên Tập:</strong> Hiệu trưởng Trường THCS Đồng Tân
+                  <strong>🌐 Trưởng Ban Biên Tập:</strong> Hiệu trưởng {schoolName}
                 </div>
               </div>
 
@@ -57,8 +63,8 @@ export default function ContactView() {
               <div style={{ marginTop: '20px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #cbd5e1', height: '200px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '15px' }}>
                 <div>
                   <MapPin size={32} color="#0056a6" style={{ margin: '0 auto 6px auto' }} />
-                  <strong style={{ display: 'block', color: '#003a73' }}>Vị trí địa lý Xã Hữu Lũng - Tỉnh Lạng Sơn</strong>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>Bản đồ chỉ đường tới Trường THCS Đồng Tân</span>
+                  <strong style={{ display: 'block', color: '#003a73' }}>Vị trí địa lý: {address}</strong>
+                  <span style={{ fontSize: '12px', color: '#64748b' }}>Bản đồ chỉ đường tới {schoolName}</span>
                 </div>
               </div>
             </div>
