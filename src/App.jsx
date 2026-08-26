@@ -243,6 +243,18 @@ export default function App() {
     localStorage.setItem('portal_docs', JSON.stringify(documents));
   }, [documents]);
 
+  useEffect(() => {
+    localStorage.setItem('portal_resources', JSON.stringify(resources));
+  }, [resources]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_albums', JSON.stringify(albums));
+  }, [albums]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_docs', JSON.stringify(documents));
+  }, [documents]);
+
 
   // Main Live Data Fetcher from Supabase Cloud Postgres
   const fetchCloudData = async () => {
