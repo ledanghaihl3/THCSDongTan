@@ -249,31 +249,64 @@ export default function AdminPortal({
     fetchUsers();
   };
 
+  const compressImage = (file, maxWidth = 250, maxHeight = 250, quality = 0.85) => {
+    return new Promise((resolve) => {
+      if (!file || typeof file === 'string') {
+        resolve(file);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(null);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (file, setUrlCallback) => {
     if (!file) return;
     setUploading(true);
-    setMessage('⏳ Đang tải tệp ảnh lên Supabase Cloud Storage...');
+    setMessage('⏳ Đang xử lý và tải ảnh...');
     try {
+      const compressedUrl = await compressImage(file, 250, 250, 0.85);
+      if (compressedUrl) {
+        setUrlCallback(compressedUrl);
+        setIsConfigDirty(true);
+        setMessage(`✅ Đã nén và nhận ảnh thành công: ${file.name}`);
+      }
+
       const publicUrl = await uploadFileToSupabase(file, 'uploads');
       if (publicUrl) {
         setUrlCallback(publicUrl);
         setIsConfigDirty(true);
-        setMessage(`✅ Đã tải ảnh lên Supabase Cloud thành công: ${file.name}`);
-      } else {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const b64 = e.target.result;
-          setUrlCallback(b64);
-          setIsConfigDirty(true);
-          const uploadedB64 = await uploadBase64ToSupabase(b64, 'uploads');
-          if (uploadedB64) {
-            setUrlCallback(uploadedB64);
-            setMessage(`✅ Đã tải và lưu trữ ảnh công khai lên Supabase Cloud thành công: ${file.name}`);
-          } else {
-            setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
-          }
-        };
-        reader.readAsDataURL(file);
+        setMessage(`✅ Đã tải ảnh công khai lên Supabase Cloud thành công: ${file.name}`);
       }
     } catch (err) {
       console.error('Lỗi upload file:', err);
@@ -297,16 +330,10 @@ export default function AdminPortal({
     try {
       const sanitizeAvatar = async (url, defaultUrl) => {
         if (!url) return defaultUrl;
-        if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
+        if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image/'))) {
           return url;
         }
-        if (typeof url === 'string' && url.startsWith('data:image/')) {
-          const timeout = new Promise(resolve => setTimeout(() => resolve(null), 2500));
-          const upload = uploadBase64ToSupabase(url, 'uploads');
-          const uploaded = await Promise.race([upload, timeout]);
-          return uploaded || defaultUrl;
-        }
-        return url;
+        return defaultUrl;
       };
 
       const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([

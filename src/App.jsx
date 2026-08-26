@@ -493,16 +493,10 @@ export default function App() {
       try {
         const sanitizeAvatar = async (url, defaultUrl) => {
           if (!url) return defaultUrl;
-          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
+          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image/'))) {
             return url;
           }
-          if (typeof url === 'string' && url.startsWith('data:image/')) {
-            const timeout = new Promise(resolve => setTimeout(() => resolve(null), 3000));
-            const upload = uploadBase64ToSupabase(url, 'uploads');
-            const uploaded = await Promise.race([upload, timeout]);
-            return uploaded || defaultUrl;
-          }
-          return url;
+          return defaultUrl;
         };
 
         const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
