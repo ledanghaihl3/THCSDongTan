@@ -486,9 +486,6 @@ export default function App() {
   }, []);
 
   const handleSaveSiteConfig = async (newConfig) => {
-    setSiteConfig(newConfig);
-    localStorage.setItem('portal_site_config', JSON.stringify(newConfig));
-
     try {
       const sanitizeAvatar = (url, defaultUrl) => {
         if (!url) return defaultUrl;
@@ -498,26 +495,49 @@ export default function App() {
         return defaultUrl;
       };
 
+      // Tự động tải ảnh Base64 lên Supabase Storage nhận link HTTP công khai vĩnh viễn
+      const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
+        uploadBase64ToSupabase(newConfig.principalAvatar).then(url => sanitizeAvatar(url || newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80')),
+        uploadBase64ToSupabase(newConfig.vicePrincipalAvatar).then(url => sanitizeAvatar(url || newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80')),
+        uploadBase64ToSupabase(newConfig.teamLeader1Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80')),
+        uploadBase64ToSupabase(newConfig.teamLeader2Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80')),
+        uploadBase64ToSupabase(newConfig.teamLeader3Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80')),
+        uploadBase64ToSupabase(newConfig.teamLeader4Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'))
+      ]);
+
       const bghPayload = {
         principal: newConfig.principal,
-        principalAvatar: sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+        principalAvatar: pAv,
         vicePrincipal: newConfig.vicePrincipal,
-        vicePrincipalAvatar: sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+        vicePrincipalAvatar: vpAv,
         teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1 || 'Cô Nguyễn Thanh Mai',
         teamLeader1Title: newConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
-        teamLeader1Avatar: sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+        teamLeader1Avatar: t1Av,
         teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2 || 'Cô Đặng Thị Thảo',
         teamLeader2Title: newConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
-        teamLeader2Avatar: sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+        teamLeader2Avatar: t2Av,
         teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3 || 'Cô Phạm Thị Hằng',
         teamLeader3Title: newConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
-        teamLeader3Avatar: sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+        teamLeader3Avatar: t3Av,
         teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4 || 'Cô Hoàng Thị Chuyên',
         teamLeader4Title: newConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
-        teamLeader4Avatar: sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+        teamLeader4Avatar: t4Av
       };
 
-      await saveSiteConfigToSupabase(newConfig, bghPayload);
+      const updatedConfig = {
+        ...newConfig,
+        principalAvatar: pAv,
+        vicePrincipalAvatar: vpAv,
+        teamLeader1Avatar: t1Av,
+        teamLeader2Avatar: t2Av,
+        teamLeader3Avatar: t3Av,
+        teamLeader4Avatar: t4Av
+      };
+
+      setSiteConfig(updatedConfig);
+      localStorage.setItem('portal_site_config', JSON.stringify(updatedConfig));
+
+      await saveSiteConfigToSupabase(updatedConfig, bghPayload);
     } catch (err) {
       console.error('Lỗi lưu site_config Supabase:', err);
     }
