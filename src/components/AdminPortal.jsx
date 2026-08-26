@@ -275,23 +275,29 @@ export default function AdminPortal({
     let isCloudSuccess = false;
     if (supabase) {
       try {
+        const sanitizeAvatar = (url, defaultUrl) => {
+          if (!url) return defaultUrl;
+          if (typeof url === 'string' && url.startsWith('data:image/')) return defaultUrl;
+          return url;
+        };
+
         const bghPayload = {
           principal: configState.principal,
-          principalAvatar: configState.principalAvatar,
+          principalAvatar: sanitizeAvatar(configState.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
           vicePrincipal: configState.vicePrincipal,
-          vicePrincipalAvatar: configState.vicePrincipalAvatar,
+          vicePrincipalAvatar: sanitizeAvatar(configState.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
           teamLeader1Name: configState.teamLeader1Name,
           teamLeader1Title: configState.teamLeader1Title,
-          teamLeader1Avatar: configState.teamLeader1Avatar,
+          teamLeader1Avatar: sanitizeAvatar(configState.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
           teamLeader2Name: configState.teamLeader2Name,
           teamLeader2Title: configState.teamLeader2Title,
-          teamLeader2Avatar: configState.teamLeader2Avatar,
+          teamLeader2Avatar: sanitizeAvatar(configState.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
           teamLeader3Name: configState.teamLeader3Name,
           teamLeader3Title: configState.teamLeader3Title,
-          teamLeader3Avatar: configState.teamLeader3Avatar,
+          teamLeader3Avatar: sanitizeAvatar(configState.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
           teamLeader4Name: configState.teamLeader4Name,
           teamLeader4Title: configState.teamLeader4Title,
-          teamLeader4Avatar: configState.teamLeader4Avatar
+          teamLeader4Avatar: sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
         };
 
         const cleanLogoUrl = (configState.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];

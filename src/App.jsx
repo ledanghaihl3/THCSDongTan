@@ -473,23 +473,29 @@ export default function App() {
 
     if (supabase) {
       try {
+        const sanitizeAvatar = (url, defaultUrl) => {
+          if (!url) return defaultUrl;
+          if (typeof url === 'string' && url.startsWith('data:image/')) return defaultUrl;
+          return url;
+        };
+
         const bghPayload = {
           principal: newConfig.principal,
-          principalAvatar: newConfig.principalAvatar,
+          principalAvatar: sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
           vicePrincipal: newConfig.vicePrincipal,
-          vicePrincipalAvatar: newConfig.vicePrincipalAvatar,
+          vicePrincipalAvatar: sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
           teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1,
           teamLeader1Title: newConfig.teamLeader1Title,
-          teamLeader1Avatar: newConfig.teamLeader1Avatar,
+          teamLeader1Avatar: sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
           teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2,
           teamLeader2Title: newConfig.teamLeader2Title,
-          teamLeader2Avatar: newConfig.teamLeader2Avatar,
+          teamLeader2Avatar: sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
           teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3,
           teamLeader3Title: newConfig.teamLeader3Title,
-          teamLeader3Avatar: newConfig.teamLeader3Avatar,
+          teamLeader3Avatar: sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
           teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4,
           teamLeader4Title: newConfig.teamLeader4Title,
-          teamLeader4Avatar: newConfig.teamLeader4Avatar
+          teamLeader4Avatar: sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
         };
 
         const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
