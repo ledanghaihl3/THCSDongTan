@@ -386,26 +386,26 @@ export default function App() {
             mission: cfgData.mission || INITIAL_SITE_CONFIG.mission,
             vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
 
-            principal: bghData.principal || cfgData.principal || cfgData.principal_name || INITIAL_SITE_CONFIG.principal,
-            principalAvatar: bghData.principalAvatar || cfgData.principal_avatar || INITIAL_SITE_CONFIG.principalAvatar,
-            vicePrincipal: bghData.vicePrincipal || cfgData.vice_principal || INITIAL_SITE_CONFIG.vicePrincipal,
-            vicePrincipalAvatar: bghData.vicePrincipalAvatar || cfgData.vice_principal_avatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
+            principal: bghData.principal || cfgData.principal || cfgData.principal_name || prev.principal || INITIAL_SITE_CONFIG.principal,
+            principalAvatar: bghData.principalAvatar || cfgData.principal_avatar || prev.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar,
+            vicePrincipal: bghData.vicePrincipal || cfgData.vice_principal || prev.vicePrincipal || INITIAL_SITE_CONFIG.vicePrincipal,
+            vicePrincipalAvatar: bghData.vicePrincipalAvatar || cfgData.vice_principal_avatar || prev.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
 
-            teamLeader1Name: bghData.teamLeader1Name || cfgData.team_leader_1_name || INITIAL_SITE_CONFIG.teamLeader1Name,
-            teamLeader1Title: bghData.teamLeader1Title || cfgData.team_leader_1_title || INITIAL_SITE_CONFIG.teamLeader1Title,
-            teamLeader1Avatar: bghData.teamLeader1Avatar || cfgData.team_leader_1_avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
+            teamLeader1Name: bghData.teamLeader1Name || cfgData.team_leader_1_name || prev.teamLeader1Name || INITIAL_SITE_CONFIG.teamLeader1Name,
+            teamLeader1Title: bghData.teamLeader1Title || cfgData.team_leader_1_title || prev.teamLeader1Title || INITIAL_SITE_CONFIG.teamLeader1Title,
+            teamLeader1Avatar: bghData.teamLeader1Avatar || cfgData.team_leader_1_avatar || prev.teamLeader1Avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
 
-            teamLeader2Name: bghData.teamLeader2Name || cfgData.team_leader_2_name || INITIAL_SITE_CONFIG.teamLeader2Name,
-            teamLeader2Title: bghData.teamLeader2Title || cfgData.team_leader_2_title || INITIAL_SITE_CONFIG.teamLeader2Title,
-            teamLeader2Avatar: bghData.teamLeader2Avatar || cfgData.team_leader_2_avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
+            teamLeader2Name: bghData.teamLeader2Name || cfgData.team_leader_2_name || prev.teamLeader2Name || INITIAL_SITE_CONFIG.teamLeader2Name,
+            teamLeader2Title: bghData.teamLeader2Title || cfgData.team_leader_2_title || prev.teamLeader2Title || INITIAL_SITE_CONFIG.teamLeader2Title,
+            teamLeader2Avatar: bghData.teamLeader2Avatar || cfgData.team_leader_2_avatar || prev.teamLeader2Avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
 
-            teamLeader3Name: bghData.teamLeader3Name || cfgData.team_leader_3_name || INITIAL_SITE_CONFIG.teamLeader3Name,
-            teamLeader3Title: bghData.teamLeader3Title || cfgData.team_leader_3_title || INITIAL_SITE_CONFIG.teamLeader3Title,
-            teamLeader3Avatar: bghData.teamLeader3Avatar || cfgData.team_leader_3_avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
+            teamLeader3Name: bghData.teamLeader3Name || cfgData.team_leader_3_name || prev.teamLeader3Name || INITIAL_SITE_CONFIG.teamLeader3Name,
+            teamLeader3Title: bghData.teamLeader3Title || cfgData.team_leader_3_title || prev.teamLeader3Title || INITIAL_SITE_CONFIG.teamLeader3Title,
+            teamLeader3Avatar: bghData.teamLeader3Avatar || cfgData.team_leader_3_avatar || prev.teamLeader3Avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
 
-            teamLeader4Name: bghData.teamLeader4Name || cfgData.team_leader_4_name || INITIAL_SITE_CONFIG.teamLeader4Name,
-            teamLeader4Title: bghData.teamLeader4Title || cfgData.team_leader_4_title || INITIAL_SITE_CONFIG.teamLeader4Title,
-            teamLeader4Avatar: bghData.teamLeader4Avatar || cfgData.team_leader_4_avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
+            teamLeader4Name: bghData.teamLeader4Name || cfgData.team_leader_4_name || prev.teamLeader4Name || INITIAL_SITE_CONFIG.teamLeader4Name,
+            teamLeader4Title: bghData.teamLeader4Title || cfgData.team_leader_4_title || prev.teamLeader4Title || INITIAL_SITE_CONFIG.teamLeader4Title,
+            teamLeader4Avatar: bghData.teamLeader4Avatar || cfgData.team_leader_4_avatar || prev.teamLeader4Avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
           };
           localStorage.setItem('portal_site_config', JSON.stringify(merged));
           return merged;
