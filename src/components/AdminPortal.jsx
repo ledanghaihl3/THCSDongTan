@@ -73,9 +73,9 @@ export default function AdminPortal({
     setConfigState(prev => ({ ...prev, [field]: value }));
   };
 
-  // Keep configState updated when siteConfig prop changes from Supabase sync ONLY if user is not currently editing
+  // Keep configState updated when siteConfig prop first loads (do not overwrite while admin is editing/saving)
   useEffect(() => {
-    if (!isConfigDirty && siteConfig && siteConfig.schoolName) {
+    if (siteConfig && siteConfig.schoolName && !configState.schoolName) {
       let addr = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
       if (!addr || addr.includes('Thôn Đồng Tân') || addr.includes('Xã Đồng Tân')) {
         addr = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
@@ -107,7 +107,7 @@ export default function AdminPortal({
         teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
       });
     }
-  }, [siteConfig, isConfigDirty]);
+  }, [siteConfig]);
 
   // User Management State
   const [userList, setUserList] = useState([]);
