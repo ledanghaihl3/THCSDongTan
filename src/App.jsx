@@ -445,14 +445,14 @@ export default function App() {
 
   useEffect(() => {
     fetchCloudData();
-    const interval = setInterval(fetchCloudData, 4000);
+    const interval = setInterval(fetchCloudData, 2000);
 
     let channel;
     if (supabase) {
       try {
         channel = supabase
-          .channel('public_db_changes')
-          .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+          .channel('public_site_config_realtime_' + Date.now())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'site_config' }, () => {
             fetchCloudData();
           })
           .subscribe();
@@ -788,6 +788,7 @@ export default function App() {
         setActiveTab={(tab) => {
           setActiveTab(tab);
           setSelectedCategory(null);
+          fetchCloudData();
         }} 
         user={user}
         onOpenAdmin={() => setActiveTab('admin')} 
