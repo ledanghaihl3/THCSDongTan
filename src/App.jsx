@@ -349,12 +349,24 @@ export default function App() {
       }
 
       if (cfgData) {
+        let rawSlogan = cfgData.slogan || INITIAL_SITE_CONFIG.slogan;
+        let cleanSlogan = rawSlogan;
+        let bghData = {};
+
+        if (rawSlogan && rawSlogan.includes('|||BGH_JSON:')) {
+          const parts = rawSlogan.split('|||BGH_JSON:');
+          cleanSlogan = parts[0];
+          try {
+            bghData = JSON.parse(parts[1]);
+          } catch (e) {}
+        }
+
         setSiteConfig(prev => {
           const merged = {
             ...prev,
             schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
             governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
-            slogan: cfgData.slogan || INITIAL_SITE_CONFIG.slogan,
+            slogan: cleanSlogan,
             address: cfgData.address || INITIAL_SITE_CONFIG.address,
             phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
             email: cfgData.email || INITIAL_SITE_CONFIG.email,
@@ -363,22 +375,27 @@ export default function App() {
             history: cfgData.history || INITIAL_SITE_CONFIG.history,
             mission: cfgData.mission || INITIAL_SITE_CONFIG.mission,
             vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
-            principal: cfgData.principal || cfgData.principal_name || INITIAL_SITE_CONFIG.principal,
-            principalAvatar: cfgData.principal_avatar || cfgData.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar,
-            vicePrincipal: cfgData.vice_principal || cfgData.vicePrincipal || INITIAL_SITE_CONFIG.vicePrincipal,
-            vicePrincipalAvatar: cfgData.vice_principal_avatar || cfgData.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
-            teamLeader1Name: cfgData.team_leader_1_name || cfgData.team_leader_1 || INITIAL_SITE_CONFIG.teamLeader1Name,
-            teamLeader1Title: cfgData.team_leader_1_title || INITIAL_SITE_CONFIG.teamLeader1Title,
-            teamLeader1Avatar: cfgData.team_leader_1_avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
-            teamLeader2Name: cfgData.team_leader_2_name || cfgData.team_leader_2 || INITIAL_SITE_CONFIG.teamLeader2Name,
-            teamLeader2Title: cfgData.team_leader_2_title || INITIAL_SITE_CONFIG.teamLeader2Title,
-            teamLeader2Avatar: cfgData.team_leader_2_avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
-            teamLeader3Name: cfgData.team_leader_3_name || cfgData.team_leader_3 || INITIAL_SITE_CONFIG.teamLeader3Name,
-            teamLeader3Title: cfgData.team_leader_3_title || INITIAL_SITE_CONFIG.teamLeader3Title,
-            teamLeader3Avatar: cfgData.team_leader_3_avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
-            teamLeader4Name: cfgData.team_leader_4_name || cfgData.team_leader_4 || INITIAL_SITE_CONFIG.teamLeader4Name,
-            teamLeader4Title: cfgData.team_leader_4_title || INITIAL_SITE_CONFIG.teamLeader4Title,
-            teamLeader4Avatar: cfgData.team_leader_4_avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
+
+            principal: bghData.principal || cfgData.principal || cfgData.principal_name || INITIAL_SITE_CONFIG.principal,
+            principalAvatar: bghData.principalAvatar || cfgData.principal_avatar || INITIAL_SITE_CONFIG.principalAvatar,
+            vicePrincipal: bghData.vicePrincipal || cfgData.vice_principal || INITIAL_SITE_CONFIG.vicePrincipal,
+            vicePrincipalAvatar: bghData.vicePrincipalAvatar || cfgData.vice_principal_avatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
+
+            teamLeader1Name: bghData.teamLeader1Name || cfgData.team_leader_1_name || INITIAL_SITE_CONFIG.teamLeader1Name,
+            teamLeader1Title: bghData.teamLeader1Title || cfgData.team_leader_1_title || INITIAL_SITE_CONFIG.teamLeader1Title,
+            teamLeader1Avatar: bghData.teamLeader1Avatar || cfgData.team_leader_1_avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
+
+            teamLeader2Name: bghData.teamLeader2Name || cfgData.team_leader_2_name || INITIAL_SITE_CONFIG.teamLeader2Name,
+            teamLeader2Title: bghData.teamLeader2Title || cfgData.team_leader_2_title || INITIAL_SITE_CONFIG.teamLeader2Title,
+            teamLeader2Avatar: bghData.teamLeader2Avatar || cfgData.team_leader_2_avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
+
+            teamLeader3Name: bghData.teamLeader3Name || cfgData.team_leader_3_name || INITIAL_SITE_CONFIG.teamLeader3Name,
+            teamLeader3Title: bghData.teamLeader3Title || cfgData.team_leader_3_title || INITIAL_SITE_CONFIG.teamLeader3Title,
+            teamLeader3Avatar: bghData.teamLeader3Avatar || cfgData.team_leader_3_avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
+
+            teamLeader4Name: bghData.teamLeader4Name || cfgData.team_leader_4_name || INITIAL_SITE_CONFIG.teamLeader4Name,
+            teamLeader4Title: bghData.teamLeader4Title || cfgData.team_leader_4_title || INITIAL_SITE_CONFIG.teamLeader4Title,
+            teamLeader4Avatar: bghData.teamLeader4Avatar || cfgData.team_leader_4_avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
           };
           localStorage.setItem('portal_site_config', JSON.stringify(merged));
           return merged;
@@ -453,37 +470,41 @@ export default function App() {
   const handleSaveSiteConfig = async (newConfig) => {
     setSiteConfig(newConfig);
     localStorage.setItem('portal_site_config', JSON.stringify(newConfig));
+
     if (supabase) {
       try {
+        const bghPayload = {
+          principal: newConfig.principal,
+          principalAvatar: newConfig.principalAvatar,
+          vicePrincipal: newConfig.vicePrincipal,
+          vicePrincipalAvatar: newConfig.vicePrincipalAvatar,
+          teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1,
+          teamLeader1Title: newConfig.teamLeader1Title,
+          teamLeader1Avatar: newConfig.teamLeader1Avatar,
+          teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2,
+          teamLeader2Title: newConfig.teamLeader2Title,
+          teamLeader2Avatar: newConfig.teamLeader2Avatar,
+          teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3,
+          teamLeader3Title: newConfig.teamLeader3Title,
+          teamLeader3Avatar: newConfig.teamLeader3Avatar,
+          teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4,
+          teamLeader4Title: newConfig.teamLeader4Title,
+          teamLeader4Avatar: newConfig.teamLeader4Avatar
+        };
+
+        const cleanSloganText = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
+        const packedSlogan = cleanSloganText + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
         await supabase.from('site_config').upsert({
           id: 1,
           school_name: newConfig.schoolName,
           governing_body: newConfig.governingBody,
-          slogan: newConfig.slogan,
+          slogan: packedSlogan,
           address: newConfig.address,
           phone: newConfig.phone,
           email: newConfig.email,
           logo_url: newConfig.logoUrl,
           banner_bg: newConfig.bannerBg,
-          history: newConfig.history,
-          mission: newConfig.mission,
-          vision: newConfig.vision,
-          principal: newConfig.principal,
-          principal_avatar: newConfig.principalAvatar,
-          vice_principal: newConfig.vicePrincipal,
-          vice_principal_avatar: newConfig.vicePrincipalAvatar,
-          team_leader_1_name: newConfig.teamLeader1Name || newConfig.teamLeader1,
-          team_leader_1_title: newConfig.teamLeader1Title,
-          team_leader_1_avatar: newConfig.teamLeader1Avatar,
-          team_leader_2_name: newConfig.teamLeader2Name || newConfig.teamLeader2,
-          team_leader_2_title: newConfig.teamLeader2Title,
-          team_leader_2_avatar: newConfig.teamLeader2Avatar,
-          team_leader_3_name: newConfig.teamLeader3Name || newConfig.teamLeader3,
-          team_leader_3_title: newConfig.teamLeader3Title,
-          team_leader_3_avatar: newConfig.teamLeader3Avatar,
-          team_leader_4_name: newConfig.teamLeader4Name || newConfig.teamLeader4,
-          team_leader_4_title: newConfig.teamLeader4Title,
-          team_leader_4_avatar: newConfig.teamLeader4Avatar,
           updated_at: new Date().toISOString()
         });
       } catch (err) {

@@ -69,11 +69,15 @@ export default function AdminPortal({
   // Keep configState updated when siteConfig prop changes from Supabase sync
   useEffect(() => {
     if (siteConfig && siteConfig.schoolName) {
+      let addr = siteConfig.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+      if (!addr || addr.includes('Thôn Đồng Tân') || addr.includes('Xã Đồng Tân')) {
+        addr = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+      }
       setConfigState({
         schoolName: siteConfig.schoolName,
         governingBody: siteConfig.governingBody,
         slogan: siteConfig.slogan,
-        address: siteConfig.address,
+        address: addr,
         phone: siteConfig.phone,
         email: siteConfig.email,
         logoUrl: siteConfig.logoUrl,
@@ -257,32 +261,38 @@ export default function AdminPortal({
     }
     if (supabase) {
       try {
+        const bghPayload = {
+          principal: configState.principal,
+          principalAvatar: configState.principalAvatar,
+          vicePrincipal: configState.vicePrincipal,
+          vicePrincipalAvatar: configState.vicePrincipalAvatar,
+          teamLeader1Name: configState.teamLeader1Name,
+          teamLeader1Title: configState.teamLeader1Title,
+          teamLeader1Avatar: configState.teamLeader1Avatar,
+          teamLeader2Name: configState.teamLeader2Name,
+          teamLeader2Title: configState.teamLeader2Title,
+          teamLeader2Avatar: configState.teamLeader2Avatar,
+          teamLeader3Name: configState.teamLeader3Name,
+          teamLeader3Title: configState.teamLeader3Title,
+          teamLeader3Avatar: configState.teamLeader3Avatar,
+          teamLeader4Name: configState.teamLeader4Name,
+          teamLeader4Title: configState.teamLeader4Title,
+          teamLeader4Avatar: configState.teamLeader4Avatar
+        };
+
+        const cleanSloganText = (configState.slogan || '').split('|||BGH_JSON:')[0];
+        const packedSlogan = cleanSloganText + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
         await supabase.from('site_config').upsert({
           id: 1,
           school_name: configState.schoolName,
           governing_body: configState.governingBody,
-          slogan: configState.slogan,
+          slogan: packedSlogan,
           address: configState.address,
           phone: configState.phone,
           email: configState.email,
           logo_url: configState.logoUrl,
           banner_bg: configState.bannerBg,
-          principal: configState.principal,
-          principal_avatar: configState.principalAvatar,
-          vice_principal: configState.vicePrincipal,
-          vice_principal_avatar: configState.vicePrincipalAvatar,
-          team_leader_1_name: configState.teamLeader1Name,
-          team_leader_1_title: configState.teamLeader1Title,
-          team_leader_1_avatar: configState.teamLeader1Avatar,
-          team_leader_2_name: configState.teamLeader2Name,
-          team_leader_2_title: configState.teamLeader2Title,
-          team_leader_2_avatar: configState.teamLeader2Avatar,
-          team_leader_3_name: configState.teamLeader3Name,
-          team_leader_3_title: configState.teamLeader3Title,
-          team_leader_3_avatar: configState.teamLeader3Avatar,
-          team_leader_4_name: configState.teamLeader4Name,
-          team_leader_4_title: configState.teamLeader4Title,
-          team_leader_4_avatar: configState.teamLeader4Avatar,
           updated_at: new Date().toISOString()
         });
       } catch (err) {}
