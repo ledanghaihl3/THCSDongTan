@@ -87,6 +87,9 @@ export const saveSiteConfigToSupabase = async (newConfig, bghPayload) => {
     const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
     const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
+    // Luôn lưu bản sao dự phòng tức thì vào localStorage thiết bị
+    localStorage.setItem('pending_site_config_save', JSON.stringify({ newConfig, bghPayload, timestamp: Date.now() }));
+
     const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config`, {
       method: 'POST',
       headers: {
@@ -109,7 +112,11 @@ export const saveSiteConfigToSupabase = async (newConfig, bghPayload) => {
       })
     });
 
-    return response.ok || response.status === 200 || response.status === 201 || response.status === 204;
+    if (response.ok || response.status === 200 || response.status === 201 || response.status === 204) {
+      localStorage.removeItem('pending_site_config_save');
+      return true;
+    }
+    return false;
   } catch (err) {
     console.error('Lỗi saveSiteConfigToSupabase:', err);
     return false;

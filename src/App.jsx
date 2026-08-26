@@ -373,6 +373,15 @@ export default function App() {
       }
 
       if (cfgData) {
+        // Tự động đồng bộ các bản lưu bị gián đoạn do Cloud 503
+        const pendingSave = localStorage.getItem('pending_site_config_save');
+        if (pendingSave) {
+          try {
+            const parsedPending = JSON.parse(pendingSave);
+            saveSiteConfigToSupabase(parsedPending.newConfig, parsedPending.bghPayload);
+          } catch (e) {}
+        }
+
         let rawSlogan = cfgData.slogan || INITIAL_SITE_CONFIG.slogan;
         let cleanSlogan = rawSlogan;
         let rawLogoUrl = cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl;
@@ -395,6 +404,8 @@ export default function App() {
           } catch (e) {}
         }
 
+        const isCustomUrl = (url) => typeof url === 'string' && url.length > 5 && !url.includes('images.unsplash.com');
+
         setSiteConfig(prev => {
           const merged = {
             ...prev,
@@ -411,25 +422,25 @@ export default function App() {
             vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
 
             principal: bghData.principal || cfgData.principal || cfgData.principal_name || prev.principal || INITIAL_SITE_CONFIG.principal,
-            principalAvatar: bghData.principalAvatar || cfgData.principal_avatar || prev.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar,
+            principalAvatar: isCustomUrl(bghData.principalAvatar) ? bghData.principalAvatar : (isCustomUrl(prev.principalAvatar) ? prev.principalAvatar : (bghData.principalAvatar || prev.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar)),
             vicePrincipal: bghData.vicePrincipal || cfgData.vice_principal || prev.vicePrincipal || INITIAL_SITE_CONFIG.vicePrincipal,
-            vicePrincipalAvatar: bghData.vicePrincipalAvatar || cfgData.vice_principal_avatar || prev.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar,
+            vicePrincipalAvatar: isCustomUrl(bghData.vicePrincipalAvatar) ? bghData.vicePrincipalAvatar : (isCustomUrl(prev.vicePrincipalAvatar) ? prev.vicePrincipalAvatar : (bghData.vicePrincipalAvatar || prev.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar)),
 
             teamLeader1Name: bghData.teamLeader1Name || cfgData.team_leader_1_name || prev.teamLeader1Name || INITIAL_SITE_CONFIG.teamLeader1Name,
             teamLeader1Title: bghData.teamLeader1Title || cfgData.team_leader_1_title || prev.teamLeader1Title || INITIAL_SITE_CONFIG.teamLeader1Title,
-            teamLeader1Avatar: bghData.teamLeader1Avatar || cfgData.team_leader_1_avatar || prev.teamLeader1Avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar,
+            teamLeader1Avatar: isCustomUrl(bghData.teamLeader1Avatar) ? bghData.teamLeader1Avatar : (isCustomUrl(prev.teamLeader1Avatar) ? prev.teamLeader1Avatar : (bghData.teamLeader1Avatar || prev.teamLeader1Avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar)),
 
             teamLeader2Name: bghData.teamLeader2Name || cfgData.team_leader_2_name || prev.teamLeader2Name || INITIAL_SITE_CONFIG.teamLeader2Name,
             teamLeader2Title: bghData.teamLeader2Title || cfgData.team_leader_2_title || prev.teamLeader2Title || INITIAL_SITE_CONFIG.teamLeader2Title,
-            teamLeader2Avatar: bghData.teamLeader2Avatar || cfgData.team_leader_2_avatar || prev.teamLeader2Avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar,
+            teamLeader2Avatar: isCustomUrl(bghData.teamLeader2Avatar) ? bghData.teamLeader2Avatar : (isCustomUrl(prev.teamLeader2Avatar) ? prev.teamLeader2Avatar : (bghData.teamLeader2Avatar || prev.teamLeader2Avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar)),
 
             teamLeader3Name: bghData.teamLeader3Name || cfgData.team_leader_3_name || prev.teamLeader3Name || INITIAL_SITE_CONFIG.teamLeader3Name,
             teamLeader3Title: bghData.teamLeader3Title || cfgData.team_leader_3_title || prev.teamLeader3Title || INITIAL_SITE_CONFIG.teamLeader3Title,
-            teamLeader3Avatar: bghData.teamLeader3Avatar || cfgData.team_leader_3_avatar || prev.teamLeader3Avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar,
+            teamLeader3Avatar: isCustomUrl(bghData.teamLeader3Avatar) ? bghData.teamLeader3Avatar : (isCustomUrl(prev.teamLeader3Avatar) ? prev.teamLeader3Avatar : (bghData.teamLeader3Avatar || prev.teamLeader3Avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar)),
 
             teamLeader4Name: bghData.teamLeader4Name || cfgData.team_leader_4_name || prev.teamLeader4Name || INITIAL_SITE_CONFIG.teamLeader4Name,
             teamLeader4Title: bghData.teamLeader4Title || cfgData.team_leader_4_title || prev.teamLeader4Title || INITIAL_SITE_CONFIG.teamLeader4Title,
-            teamLeader4Avatar: bghData.teamLeader4Avatar || cfgData.team_leader_4_avatar || prev.teamLeader4Avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar
+            teamLeader4Avatar: isCustomUrl(bghData.teamLeader4Avatar) ? bghData.teamLeader4Avatar : (isCustomUrl(prev.teamLeader4Avatar) ? prev.teamLeader4Avatar : (bghData.teamLeader4Avatar || prev.teamLeader4Avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar))
           };
           localStorage.setItem('portal_site_config', JSON.stringify(merged));
           return merged;
