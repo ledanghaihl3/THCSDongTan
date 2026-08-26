@@ -349,15 +349,25 @@ export default function App() {
       }
 
       if (cfgData) {
+        let rawSlogan = cfgData.slogan || INITIAL_SITE_CONFIG.slogan;
+        let cleanSlogan = rawSlogan;
         let rawLogoUrl = cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl;
         let cleanLogoUrl = rawLogoUrl;
         let bghData = {};
+
+        if (rawSlogan && rawSlogan.includes('|||BGH_JSON:')) {
+          const parts = rawSlogan.split('|||BGH_JSON:');
+          cleanSlogan = parts[0];
+          try {
+            bghData = { ...bghData, ...JSON.parse(parts[1]) };
+          } catch (e) {}
+        }
 
         if (rawLogoUrl && rawLogoUrl.includes('|||BGH_JSON:')) {
           const parts = rawLogoUrl.split('|||BGH_JSON:');
           cleanLogoUrl = parts[0];
           try {
-            bghData = JSON.parse(parts[1]);
+            bghData = { ...bghData, ...JSON.parse(parts[1]) };
           } catch (e) {}
         }
 
@@ -366,12 +376,12 @@ export default function App() {
             ...prev,
             schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
             governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
-            slogan: cfgData.slogan || INITIAL_SITE_CONFIG.slogan,
+            slogan: cleanSlogan,
             address: cfgData.address || INITIAL_SITE_CONFIG.address,
             phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
             email: cfgData.email || INITIAL_SITE_CONFIG.email,
             logoUrl: cleanLogoUrl,
-            bannerBg: cfgData.banner_url || cfgData.banner_bg || INITIAL_SITE_CONFIG.bannerBg,
+            bannerBg: cfgData.banner_bg || cfgData.banner_url || INITIAL_SITE_CONFIG.bannerBg,
             history: cfgData.history || INITIAL_SITE_CONFIG.history,
             mission: cfgData.mission || INITIAL_SITE_CONFIG.mission,
             vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
