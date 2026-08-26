@@ -926,7 +926,7 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 1:</label>
-                <input type="text" value={configState.teamLeader1Name} onChange={(e) => updateConfigField('teamLeader1Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Nguyễn Văn Nam" />
+                <input type="text" value={configState.teamLeader1Name} onChange={(e) => updateConfigField('teamLeader1Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Nguyễn Thanh Mai" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
@@ -943,7 +943,7 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 2:</label>
-                <input type="text" value={configState.teamLeader2Name} onChange={(e) => updateConfigField('teamLeader2Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Trần Thị Thu Hà" />
+                <input type="text" value={configState.teamLeader2Name} onChange={(e) => updateConfigField('teamLeader2Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Đặng Thị Thảo" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
@@ -960,7 +960,7 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '12px', paddingBottom: '10px', borderBottom: '1px dashed #cbd5e1' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 3:</label>
-                <input type="text" value={configState.teamLeader3Name} onChange={(e) => updateConfigField('teamLeader3Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Thầy Lê Hoàng Long" />
+                <input type="text" value={configState.teamLeader3Name} onChange={(e) => updateConfigField('teamLeader3Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Phạm Thị Hằng" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
@@ -977,7 +977,7 @@ export default function AdminPortal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Họ tên Tổ trưởng 4:</label>
-                <input type="text" value={configState.teamLeader4Name} onChange={(e) => updateConfigField('teamLeader4Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Phạm Phương Thảo" />
+                <input type="text" value={configState.teamLeader4Name} onChange={(e) => updateConfigField('teamLeader4Name', e.target.value)} style={{ width: '100%', padding: '6px', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Cô Hoàng Thị Chuyên" />
               </div>
               <div>
                 <label style={{ display: 'block', fontWeight: '600', fontSize: '12px', marginBottom: '3px' }}>Chức danh / Tổ chuyên môn:</label>
