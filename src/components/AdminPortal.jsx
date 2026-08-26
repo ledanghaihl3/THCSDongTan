@@ -252,13 +252,27 @@ export default function AdminPortal({
   const handleFileUpload = async (file, setUrlCallback) => {
     if (!file) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setUrlCallback(e.target.result);
-      setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+    setMessage('⏳ Đang tải tệp ảnh lên Supabase Cloud Storage...');
+    try {
+      const publicUrl = await uploadFileToSupabase(file, 'uploads');
+      if (publicUrl) {
+        setUrlCallback(publicUrl);
+        setIsConfigDirty(true);
+        setMessage(`✅ Đã tải ảnh lên Supabase Cloud thành công: ${file.name}`);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setUrlCallback(e.target.result);
+          setIsConfigDirty(true);
+          setMessage(`✅ Đã đính kèm tệp tin: ${file.name}`);
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.error('Lỗi upload file:', err);
+    } finally {
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const [savingConfig, setSavingConfig] = useState(false);
@@ -277,6 +291,9 @@ export default function AdminPortal({
       try {
         const sanitizeAvatar = (url, defaultUrl) => {
           if (!url) return defaultUrl;
+          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
+            return url;
+          }
           if (typeof url === 'string' && url.startsWith('data:image/')) return defaultUrl;
           return url;
         };

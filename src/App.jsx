@@ -475,6 +475,9 @@ export default function App() {
       try {
         const sanitizeAvatar = (url, defaultUrl) => {
           if (!url) return defaultUrl;
+          if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/'))) {
+            return url;
+          }
           if (typeof url === 'string' && url.startsWith('data:image/')) return defaultUrl;
           return url;
         };
