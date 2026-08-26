@@ -489,29 +489,40 @@ export default function App() {
             return url;
           }
           if (typeof url === 'string' && url.startsWith('data:image/')) {
-            const uploaded = await uploadBase64ToSupabase(url, 'uploads');
+            const timeout = new Promise(resolve => setTimeout(() => resolve(null), 3000));
+            const upload = uploadBase64ToSupabase(url, 'uploads');
+            const uploaded = await Promise.race([upload, timeout]);
             return uploaded || defaultUrl;
           }
           return url;
         };
 
+        const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
+          sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+          sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+          sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+          sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+          sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+          sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+        ]);
+
         const bghPayload = {
           principal: newConfig.principal,
-          principalAvatar: await sanitizeAvatar(newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+          principalAvatar: pAv,
           vicePrincipal: newConfig.vicePrincipal,
-          vicePrincipalAvatar: await sanitizeAvatar(newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+          vicePrincipalAvatar: vpAv,
           teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1,
           teamLeader1Title: newConfig.teamLeader1Title,
-          teamLeader1Avatar: await sanitizeAvatar(newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+          teamLeader1Avatar: t1Av,
           teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2,
           teamLeader2Title: newConfig.teamLeader2Title,
-          teamLeader2Avatar: await sanitizeAvatar(newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+          teamLeader2Avatar: t2Av,
           teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3,
           teamLeader3Title: newConfig.teamLeader3Title,
-          teamLeader3Avatar: await sanitizeAvatar(newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+          teamLeader3Avatar: t3Av,
           teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4,
           teamLeader4Title: newConfig.teamLeader4Title,
-          teamLeader4Avatar: await sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+          teamLeader4Avatar: t4Av
         };
 
         const cleanSlogan = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
@@ -520,7 +531,7 @@ export default function App() {
         const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
         const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
-        await supabase.from('site_config').upsert({
+        const upsertPromise = supabase.from('site_config').upsert({
           id: 1,
           school_name: newConfig.schoolName,
           governing_body: newConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
@@ -532,6 +543,9 @@ export default function App() {
           banner_bg: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
           updated_at: new Date().toISOString()
         });
+
+        const dbTimeout = new Promise(resolve => setTimeout(() => resolve({ error: 'Timeout' }), 3500));
+        await Promise.race([upsertPromise, dbTimeout]);
       } catch (err) {
         console.error('Lỗi lưu site_config Supabase:', err);
       }

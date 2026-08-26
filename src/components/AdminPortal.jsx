@@ -289,6 +289,11 @@ export default function AdminPortal({
     setSavingConfig(true);
     setMessage('');
 
+    const maxSafetyTimer = setTimeout(() => {
+      setSavingConfig(false);
+      setIsConfigDirty(false);
+    }, 4000);
+
     try {
       const sanitizeAvatar = async (url, defaultUrl) => {
         if (!url) return defaultUrl;
@@ -296,29 +301,40 @@ export default function AdminPortal({
           return url;
         }
         if (typeof url === 'string' && url.startsWith('data:image/')) {
-          const uploaded = await uploadBase64ToSupabase(url, 'uploads');
+          const timeout = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+          const upload = uploadBase64ToSupabase(url, 'uploads');
+          const uploaded = await Promise.race([upload, timeout]);
           return uploaded || defaultUrl;
         }
         return url;
       };
 
+      const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
+        sanitizeAvatar(configState.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+        sanitizeAvatar(configState.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+        sanitizeAvatar(configState.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+        sanitizeAvatar(configState.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+        sanitizeAvatar(configState.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+        sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+      ]);
+
       const bghPayload = {
         principal: configState.principal,
-        principalAvatar: await sanitizeAvatar(configState.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80'),
+        principalAvatar: pAv,
         vicePrincipal: configState.vicePrincipal,
-        vicePrincipalAvatar: await sanitizeAvatar(configState.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80'),
+        vicePrincipalAvatar: vpAv,
         teamLeader1Name: configState.teamLeader1Name,
         teamLeader1Title: configState.teamLeader1Title,
-        teamLeader1Avatar: await sanitizeAvatar(configState.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'),
+        teamLeader1Avatar: t1Av,
         teamLeader2Name: configState.teamLeader2Name,
         teamLeader2Title: configState.teamLeader2Title,
-        teamLeader2Avatar: await sanitizeAvatar(configState.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'),
+        teamLeader2Avatar: t2Av,
         teamLeader3Name: configState.teamLeader3Name,
         teamLeader3Title: configState.teamLeader3Title,
-        teamLeader3Avatar: await sanitizeAvatar(configState.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80'),
+        teamLeader3Avatar: t3Av,
         teamLeader4Name: configState.teamLeader4Name,
         teamLeader4Title: configState.teamLeader4Title,
-        teamLeader4Avatar: await sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
+        teamLeader4Avatar: t4Av
       };
 
       const updatedConfig = {
@@ -336,12 +352,13 @@ export default function AdminPortal({
       }
 
       setIsConfigDirty(false);
-      const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
+      const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỜNG LÊN SUPABASE CLOUD!';
       setMessage(successMsg);
       alert(successMsg);
     } catch (err) {
       console.error('Lỗi lưu cấu hình:', err);
     } finally {
+      clearTimeout(maxSafetyTimer);
       setSavingConfig(false);
     }
   };
