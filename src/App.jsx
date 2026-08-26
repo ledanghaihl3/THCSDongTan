@@ -501,18 +501,22 @@ export default function App() {
           teamLeader4Avatar: sanitizeAvatar(newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
         };
 
+        const cleanSlogan = (newConfig.slogan || '').split('|||BGH_JSON:')[0];
+        const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
         const cleanLogoUrl = (newConfig.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
         const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
         await supabase.from('site_config').upsert({
           id: 1,
           school_name: newConfig.schoolName,
-          slogan: newConfig.slogan,
+          governing_body: newConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
+          slogan: packedSlogan,
           address: newConfig.address,
           phone: newConfig.phone,
           email: newConfig.email,
           logo_url: packedLogoUrl,
-          banner_url: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
+          banner_bg: newConfig.bannerBg || newConfig.bannerUrl || '/images/school-banner.png',
           updated_at: new Date().toISOString()
         });
       } catch (err) {

@@ -317,28 +317,38 @@ export default function AdminPortal({
           teamLeader4Avatar: sanitizeAvatar(configState.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80')
         };
 
+        const cleanSlogan = (configState.slogan || '').split('|||BGH_JSON:')[0];
+        const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
         const cleanLogoUrl = (configState.logoUrl || '/images/school-logo.jpg').split('|||BGH_JSON:')[0];
         const packedLogoUrl = cleanLogoUrl + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
-        const { error } = await supabase.from('site_config').upsert({
+        const upsertData = {
           id: 1,
           school_name: configState.schoolName,
-          slogan: configState.slogan,
+          governing_body: configState.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
+          slogan: packedSlogan,
           address: configState.address,
           phone: configState.phone,
           email: configState.email,
           logo_url: packedLogoUrl,
-          banner_url: configState.bannerBg || '/images/school-banner.png',
+          banner_bg: configState.bannerBg || '/images/school-banner.png',
           updated_at: new Date().toISOString()
-        });
+        };
+
+        const { error } = await supabase.from('site_config').upsert(upsertData);
         if (!error) isCloudSuccess = true;
       } catch (err) {
         console.error('Lỗi lưu Supabase:', err);
+      } finally {
+        setSavingConfig(false);
+        setIsConfigDirty(false);
       }
+    } else {
+      setSavingConfig(false);
+      setIsConfigDirty(false);
     }
 
-    setSavingConfig(false);
-    setIsConfigDirty(false);
     const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
     setMessage(successMsg);
     alert(successMsg);
