@@ -254,11 +254,18 @@ export default function AdminPortal({
     reader.readAsDataURL(file);
   };
 
+  const [savingConfig, setSavingConfig] = useState(false);
+
   const handleSaveConfig = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    setSavingConfig(true);
+    setMessage('');
+
     if (onSaveSiteConfig) {
       onSaveSiteConfig(configState);
     }
+
+    let isCloudSuccess = false;
     if (supabase) {
       try {
         const bghPayload = {
@@ -283,7 +290,7 @@ export default function AdminPortal({
         const cleanSloganText = (configState.slogan || '').split('|||BGH_JSON:')[0];
         const packedSlogan = cleanSloganText + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
-        await supabase.from('site_config').upsert({
+        const { error } = await supabase.from('site_config').upsert({
           id: 1,
           school_name: configState.schoolName,
           governing_body: configState.governingBody,
@@ -295,9 +302,16 @@ export default function AdminPortal({
           banner_bg: configState.bannerBg,
           updated_at: new Date().toISOString()
         });
-      } catch (err) {}
+        if (!error) isCloudSuccess = true;
+      } catch (err) {
+        console.error('Lỗi lưu Supabase:', err);
+      }
     }
-    setMessage('✅ Đã lưu và đồng bộ cấu hình Ban Giám Hiệu, Tổ Trưởng Chuyên Môn & Banner lên tất cả các thiết bị thành công!');
+
+    setSavingConfig(false);
+    const successMsg = '🎉 ĐÃ LƯU VÀ ĐỒNG BỘ THÀNH CÔNG THÔNG TIN TRƯỜNG, BAN GIÁM HIỆU & TỔ TRƯỞNG LÊN SUPABASE CLOUD!';
+    setMessage(successMsg);
+    alert(successMsg);
   };
 
   const handleLoginSubmit = async (e) => {
@@ -901,9 +915,36 @@ export default function AdminPortal({
             </div>
           </div>
 
-          <button type="submit" style={{ background: '#16a34a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '4px', fontWeight: '700', cursor: 'pointer', justifySelf: 'start', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Save size={16} /> LƯU & ĐỒNG BỘ CẤU HÌNH TRÊN SUPABASE CLOUD
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+            <button 
+              type="submit" 
+              onClick={handleSaveConfig}
+              disabled={savingConfig}
+              style={{ 
+                background: savingConfig ? '#94a3b8' : '#16a34a', 
+                color: 'white', 
+                border: 'none', 
+                padding: '12px 24px', 
+                borderRadius: '6px', 
+                fontWeight: '700', 
+                fontSize: '14px',
+                cursor: savingConfig ? 'not-allowed' : 'pointer', 
+                justifySelf: 'start', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                boxShadow: '0 2px 6px rgba(22, 163, 74, 0.3)'
+              }}
+            >
+              <Save size={18} /> {savingConfig ? '⏳ ĐANG LƯU LÊN SUPABASE CLOUD...' : '💾 LƯU & ĐỒNG BỘ CẤU HÌNH TRÊN SUPABASE CLOUD'}
+            </button>
+
+            {message && (
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle size={18} color="#16a34a" /> {message}
+              </div>
+            )}
+          </div>
         </form>
       )}
 
