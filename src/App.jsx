@@ -40,25 +40,25 @@ const INITIAL_SITE_CONFIG = {
   mission: 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
   vision: 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
   principal: 'Thầy Hiệu Trưởng - THCS Đồng Tân',
-  principalAvatar: '/images/school-logo.jpg',
+  principalAvatar: '/images/principal.jpg',
   vicePrincipal: 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
-  vicePrincipalAvatar: '/images/school-logo.jpg',
+  vicePrincipalAvatar: '/images/vice-principal.jpg',
 
   teamLeader1Name: 'Cô Nguyễn Thanh Mai',
   teamLeader1Title: 'Tổ trưởng Tổ Toán - KHTN',
-  teamLeader1Avatar: '/images/school-logo.jpg',
+  teamLeader1Avatar: '/images/team-leader-1.jpg',
 
   teamLeader2Name: 'Cô Đặng Thị Thảo',
   teamLeader2Title: 'Tổ trưởng Tổ Văn - KHXH',
-  teamLeader2Avatar: '/images/school-logo.jpg',
+  teamLeader2Avatar: '/images/team-leader-2.jpg',
 
   teamLeader3Name: 'Cô Phạm Thị Hằng',
   teamLeader3Title: 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
-  teamLeader3Avatar: '/images/school-logo.jpg',
+  teamLeader3Avatar: '/images/team-leader-3.jpg',
 
   teamLeader4Name: 'Cô Hoàng Thị Chuyên',
   teamLeader4Title: 'Tổ trưởng Tổ Hành Chính - Văn Thể',
-  teamLeader4Avatar: '/images/school-logo.jpg'
+  teamLeader4Avatar: '/images/team-leader-4.jpg'
 };
 
 // Initial Fallback Data

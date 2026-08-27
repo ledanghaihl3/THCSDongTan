@@ -93,21 +93,21 @@ export default function AdminPortal({
         logoUrl: siteConfig.logoUrl,
         bannerBg: siteConfig.bannerBg,
         principal: siteConfig.principal || 'Thầy Hiệu Trưởng - THCS Đồng Tân',
-        principalAvatar: siteConfig.principalAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80',
+        principalAvatar: siteConfig.principalAvatar || '/images/principal.jpg',
         vicePrincipal: siteConfig.vicePrincipal || 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
-        vicePrincipalAvatar: siteConfig.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
+        vicePrincipalAvatar: siteConfig.vicePrincipalAvatar || '/images/vice-principal.jpg',
         teamLeader1Name: siteConfig.teamLeader1Name || 'Cô Nguyễn Thanh Mai',
         teamLeader1Title: siteConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
-        teamLeader1Avatar: siteConfig.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
+        teamLeader1Avatar: siteConfig.teamLeader1Avatar || '/images/team-leader-1.jpg',
         teamLeader2Name: siteConfig.teamLeader2Name || 'Cô Đặng Thị Thảo',
         teamLeader2Title: siteConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
-        teamLeader2Avatar: siteConfig.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
+        teamLeader2Avatar: siteConfig.teamLeader2Avatar || '/images/team-leader-2.jpg',
         teamLeader3Name: siteConfig.teamLeader3Name || 'Cô Phạm Thị Hằng',
         teamLeader3Title: siteConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
-        teamLeader3Avatar: siteConfig.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+        teamLeader3Avatar: siteConfig.teamLeader3Avatar || '/images/team-leader-3.jpg',
         teamLeader4Name: siteConfig.teamLeader4Name || 'Cô Hoàng Thị Chuyên',
         teamLeader4Title: siteConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
-        teamLeader4Avatar: siteConfig.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'
+        teamLeader4Avatar: siteConfig.teamLeader4Avatar || '/images/team-leader-4.jpg'
       });
     }
   }, [siteConfig]);
