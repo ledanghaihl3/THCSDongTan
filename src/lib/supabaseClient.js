@@ -193,21 +193,29 @@ export const syncAllDataToSupabase = async (targetUrl = SUPABASE_URL, targetKey 
       const cleanSlogan = (localConfig.slogan || '').split('|||BGH_JSON:')[0];
       const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
 
+      const siteConfigPayload = {
+        id: 1,
+        school_name: localConfig.schoolName,
+        governing_body: localConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
+        slogan: packedSlogan,
+        address: localConfig.address,
+        phone: localConfig.phone,
+        email: localConfig.email,
+        logo_url: packedSlogan,
+        banner_bg: localConfig.bannerBg || '/images/school-banner.png',
+        updated_at: new Date().toISOString()
+      };
+
+      await fetch(`${url}/rest/v1/site_config?id=eq.1`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(siteConfigPayload)
+      });
+
       await fetch(`${url}/rest/v1/site_config`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          id: 1,
-          school_name: localConfig.schoolName,
-          governing_body: localConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
-          slogan: packedSlogan,
-          address: localConfig.address,
-          phone: localConfig.phone,
-          email: localConfig.email,
-          logo_url: localConfig.logoUrl || '/images/school-logo.jpg',
-          banner_bg: localConfig.bannerBg || '/images/school-banner.png',
-          updated_at: new Date().toISOString()
-        })
+        body: JSON.stringify(siteConfigPayload)
       });
     }
 
