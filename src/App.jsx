@@ -508,8 +508,8 @@ export default function App() {
     if (supabase) {
       try {
         channel = supabase
-          .channel('public_site_config_realtime_' + Date.now())
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'site_config' }, () => {
+          .channel('public_all_realtime_' + Date.now())
+          .on('postgres_changes', { event: '*', schema: 'public' }, () => {
             fetchCloudData();
           })
           .subscribe();
