@@ -888,6 +888,8 @@ export default function App() {
             newsList={newsList}
             documents={documents}
             resources={resources}
+            videos={videos}
+            albums={albums}
             pendingUsers={pendingUsers}
             onApproveUser={handleApproveUser}
             onRejectUser={handleRejectUser}

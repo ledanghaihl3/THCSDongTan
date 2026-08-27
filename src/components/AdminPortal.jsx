@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, LogOut, PlusCircle, FilePlus, Users, CheckCircle, Trash2, Edit, Settings, AlertCircle, Save, Check, UserCheck, Bell, UserPlus } from 'lucide-react';
 import { supabase, uploadFileToSupabase, uploadBase64ToSupabase } from '../lib/supabaseClient';
+import { downloadBackupJSON, restoreFromSnapshot, syncToCloudflareR2 } from '../lib/r2BackupClient';
 
 export default function AdminPortal({ 
   token, 
@@ -13,6 +14,8 @@ export default function AdminPortal({
   newsList = [],
   documents = [],
   resources = [],
+  videos = [],
+  albums = [],
   pendingUsers = [],
   onApproveUser,
   onRejectUser,
@@ -681,6 +684,13 @@ export default function AdminPortal({
         </button>
 
         <button 
+          onClick={() => setAdminTab('r2_backup')} 
+          style={{ padding: '8px 14px', border: 'none', borderBottom: adminTab === 'r2_backup' ? '3px solid #0056a6' : 'none', background: 'transparent', fontWeight: adminTab === 'r2_backup' ? '700' : '500', color: adminTab === 'r2_backup' ? '#0056a6' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+        >
+          <Save size={15} /> ☁️ Sao Lưu Cloudflare R2
+        </button>
+
+        <button 
           onClick={() => setAdminTab('news_list')} 
           style={{ padding: '8px 14px', border: 'none', borderBottom: adminTab === 'news_list' ? '3px solid #0056a6' : 'none', background: 'transparent', fontWeight: adminTab === 'news_list' ? '700' : '500', color: adminTab === 'news_list' ? '#0056a6' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
         >
@@ -708,6 +718,85 @@ export default function AdminPortal({
           <FilePlus size={15} /> 📄 Phát Hành Văn Bản Mới
         </button>
       </div>
+
+      {/* Tab Sao lưu Cloudflare R2 & Dự phòng Đa Đám Mây */}
+      {adminTab === 'r2_backup' && (
+        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '24px', marginBottom: '25px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0056a6', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            ☁️ TỰ ĐỘNG SAO LƯU DỮ LIỆU SANG CLOUDFLARE R2 & DỰ PHÒNG ĐA ĐÁM MÂY
+          </h2>
+          <p style={{ color: '#475569', fontSize: '14px', lineHeight: '1.6', marginBottom: '20px' }}>
+            Kênh lưu trữ phụ <strong>Cloudflare R2 (S3-compatible Object Storage)</strong> phát sóng dữ liệu đa phương tiện với <strong>phí băng thông Egress 0đ vĩnh viễn</strong>. Bản sao lưu tự động đóng gói toàn bộ bài viết, video, văn bản, tài nguyên và ảnh chân dung BGH.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+            <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '8px', padding: '20px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '15px', color: '#0369a1', fontWeight: '700', marginBottom: '8px' }}>📥 Tải Tệp Sao Lưu An Toàn (.JSON)</h3>
+              <p style={{ fontSize: '12px', color: '#0284c7', marginBottom: '16px' }}>Đóng gói toàn trường thành 1 tệp JSON nhỏ gọn cất giữ trên máy tính.</p>
+              <button 
+                type="button"
+                onClick={() => {
+                  const ok = downloadBackupJSON(siteConfig, newsList, documents, resources, videos, albums);
+                  if (ok) setMessage('✅ Đã tải tệp sao lưu JSON an toàn về máy tính!');
+                }}
+                style={{ background: '#0284c7', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              >
+                <Save size={16} /> TẢI VỀ MÁY TÍNH (.JSON)
+              </button>
+            </div>
+
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '20px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '15px', color: '#15803d', fontWeight: '700', marginBottom: '8px' }}>☁️ Đồng Bộ Sang Cloudflare R2 CDN</h3>
+              <p style={{ fontSize: '12px', color: '#16a34a', marginBottom: '16px' }}>Đẩy bản nạp dữ liệu lên mạng lưới phát sóng Cloudflare 0đ Egress.</p>
+              <button 
+                type="button"
+                onClick={async () => {
+                  setUploading(true);
+                  setMessage('⏳ Đang phát sóng bản sao lưu tới Cloudflare R2 CDN...');
+                  const res = await syncToCloudflareR2(siteConfig, newsList, documents, resources, videos, albums);
+                  setUploading(false);
+                  setMessage(res.message);
+                }}
+                disabled={uploading}
+                style={{ background: '#16a34a', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              >
+                <CheckCircle size={16} /> ĐỒNG BỘ CLOUDFLARE R2
+              </button>
+            </div>
+
+            <div style={{ background: '#fefce8', border: '1px solid #fef08a', borderRadius: '8px', padding: '20px', textAlign: 'center' }}>
+              <h3 style={{ fontSize: '15px', color: '#a16207', fontWeight: '700', marginBottom: '8px' }}>📤 Khôi Phục Từ Tệp Sao Lưu</h3>
+              <p style={{ fontSize: '12px', color: '#ca8a04', marginBottom: '16px' }}>Chọn tệp JSON sao lưu trước đó để nạp khôi phục lại trang web.</p>
+              <label style={{ background: '#ca8a04', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <FilePlus size={16} /> CHỌN TỆP JSON KHÔI PHỤC
+                <input 
+                  type="file" 
+                  accept=".json" 
+                  style={{ display: 'none' }} 
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      try {
+                        const parsed = JSON.parse(event.target.result);
+                        const res = restoreFromSnapshot(parsed);
+                        setMessage(res.message);
+                        if (res.success) {
+                          setTimeout(() => window.location.reload(), 1500);
+                        }
+                      } catch (err) {
+                        setMessage('❌ Tệp JSON không đúng định dạng!');
+                      }
+                    };
+                    reader.readAsText(file);
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tab Quản lý & Duyệt Tài Khoản */}
       {adminTab === 'users' && (
