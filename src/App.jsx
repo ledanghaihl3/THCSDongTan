@@ -536,12 +536,12 @@ export default function App() {
 
       // Tự động tải ảnh Base64 lên Supabase Storage nhận link HTTP công khai vĩnh viễn
       const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
-        uploadBase64ToSupabase(newConfig.principalAvatar).then(url => sanitizeAvatar(url || newConfig.principalAvatar, 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80')),
-        uploadBase64ToSupabase(newConfig.vicePrincipalAvatar).then(url => sanitizeAvatar(url || newConfig.vicePrincipalAvatar, 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80')),
-        uploadBase64ToSupabase(newConfig.teamLeader1Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader1Avatar, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80')),
-        uploadBase64ToSupabase(newConfig.teamLeader2Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader2Avatar, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80')),
-        uploadBase64ToSupabase(newConfig.teamLeader3Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader3Avatar, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80')),
-        uploadBase64ToSupabase(newConfig.teamLeader4Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader4Avatar, 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80'))
+        uploadBase64ToSupabase(newConfig.principalAvatar).then(url => sanitizeAvatar(url || newConfig.principalAvatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.vicePrincipalAvatar).then(url => sanitizeAvatar(url || newConfig.vicePrincipalAvatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader1Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader1Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader2Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader2Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader3Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader3Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader4Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader4Avatar, '/images/school-logo.jpg'))
       ]);
 
       const bghPayload = {

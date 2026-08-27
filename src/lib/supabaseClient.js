@@ -71,10 +71,11 @@ export const uploadBase64ToSupabase = async (base64Str, bucket = 'uploads') => {
     if (response.ok || response.status === 200) {
       return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${fileName}`;
     }
-    return null;
+    // Nếu Cloud Storage gặp lỗi 402 hoặc gián đoạn, giữ nguyên base64Str nén để ảnh luôn hiển thị 100%
+    return base64Str;
   } catch (err) {
     console.error('Lỗi upload Base64 Supabase Storage:', err);
-    return null;
+    return base64Str;
   }
 };
 
