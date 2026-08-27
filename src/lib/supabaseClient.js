@@ -123,3 +123,90 @@ export const saveSiteConfigToSupabase = async (newConfig, bghPayload) => {
     return false;
   }
 };
+
+// Check live health status of current Supabase Cloud project
+export const checkSupabaseHealth = async () => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/site_config?select=id&limit=1`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return {
+      status: response.status,
+      ok: response.ok,
+      message: response.ok ? 'Kết nối tới Supabase Cloud hoạt động hoàn hảo 200 OK' : (response.status === 402 ? 'Lỗi HTTP 402: Dự án chạm giới hạn băng thông miễn phí (exceed_egress_quota)' : `Lỗi HTTP ${response.status}`)
+    };
+  } catch (err) {
+    return { status: 0, ok: false, message: 'Không thể kết nối tới Supabase: ' + err.message };
+  }
+};
+
+// Sync complete site data to Supabase Cloud Database
+export const syncAllDataToSupabase = async (targetUrl = SUPABASE_URL, targetKey = SUPABASE_KEY) => {
+  const url = targetUrl || SUPABASE_URL;
+  const key = targetKey || SUPABASE_KEY;
+  const headers = {
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'resolution=merge-duplicates'
+  };
+
+  try {
+    const testRes = await fetch(`${url}/rest/v1/site_config?select=id&limit=1`, { headers });
+    if (!testRes.ok && testRes.status !== 200) {
+      if (testRes.status === 402) {
+        return { success: false, status: 402, message: '⚠️ Máy chủ Supabase Cloud đang bị dừng do lỗi 402 (exceed_egress_quota). Vui lòng vào Supabase Dashboard bấm Unpause Project / Reset Cap!' };
+      }
+      return { success: false, status: testRes.status, message: `❌ Máy chủ Supabase phản hồi lỗi HTTP ${testRes.status}` };
+    }
+
+    const localConfig = JSON.parse(localStorage.getItem('portal_site_config') || '{}');
+    if (localConfig && localConfig.schoolName) {
+      const bghPayload = {
+        principal: localConfig.principal,
+        principalAvatar: localConfig.principalAvatar,
+        vicePrincipal: localConfig.vicePrincipal,
+        vicePrincipalAvatar: localConfig.vicePrincipalAvatar,
+        teamLeader1Name: localConfig.teamLeader1Name,
+        teamLeader1Title: localConfig.teamLeader1Title,
+        teamLeader1Avatar: localConfig.teamLeader1Avatar,
+        teamLeader2Name: localConfig.teamLeader2Name,
+        teamLeader2Title: localConfig.teamLeader2Title,
+        teamLeader2Avatar: localConfig.teamLeader2Avatar,
+        teamLeader3Name: localConfig.teamLeader3Name,
+        teamLeader3Title: localConfig.teamLeader3Title,
+        teamLeader3Avatar: localConfig.teamLeader3Avatar,
+        teamLeader4Name: localConfig.teamLeader4Name,
+        teamLeader4Title: localConfig.teamLeader4Title,
+        teamLeader4Avatar: localConfig.teamLeader4Avatar
+      };
+      const cleanSlogan = (localConfig.slogan || '').split('|||BGH_JSON:')[0];
+      const packedSlogan = cleanSlogan + '|||BGH_JSON:' + JSON.stringify(bghPayload);
+
+      await fetch(`${url}/rest/v1/site_config`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          id: 1,
+          school_name: localConfig.schoolName,
+          governing_body: localConfig.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
+          slogan: packedSlogan,
+          address: localConfig.address,
+          phone: localConfig.phone,
+          email: localConfig.email,
+          logo_url: localConfig.logoUrl || '/images/school-logo.jpg',
+          banner_bg: localConfig.bannerBg || '/images/school-banner.png',
+          updated_at: new Date().toISOString()
+        })
+      });
+    }
+
+    return { success: true, status: 200, message: '🎉 ĐÃ ĐỒNG BỘ THÀNH CÔNG TẤT CẢ DỮ LIỆU VÀ ẢNH CHÂN DUNG LÊN SUPABASE CLOUD!' };
+  } catch (err) {
+    console.error('Lỗi syncAllDataToSupabase:', err);
+    return { success: false, message: 'Lỗi kết nối tới Supabase: ' + err.message };
+  }
+};
