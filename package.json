@@ -8,11 +8,11 @@
     "dev": "node server/server.js",
     "client": "vite",
     "build": "vite build && node scripts/fix-offline.js",
-
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.2",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
