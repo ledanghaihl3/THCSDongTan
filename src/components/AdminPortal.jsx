@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, LogOut, PlusCircle, FilePlus, Users, CheckCircle, Trash2, Edit, Settings, AlertCircle, Save, Check, UserCheck, Bell, UserPlus } from 'lucide-react';
-import { supabase, uploadFileToSupabase, uploadBase64ToSupabase } from '../lib/supabaseClient';
+import { supabase, uploadFileToSupabase, uploadBase64ToSupabase, syncAllDataToSupabase } from '../lib/supabaseClient';
 import { downloadBackupJSON, restoreFromSnapshot, syncToCloudflareR2 } from '../lib/r2BackupClient';
 
 export default function AdminPortal({ 
@@ -651,9 +651,26 @@ export default function AdminPortal({
             Xin chào: <strong>{user?.fullName}</strong> ({user?.role === 'BGH' ? 'Ban Giám Hiệu' : 'Giáo viên Biên tập'})
           </span>
         </div>
-        <button onClick={onLogout} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <LogOut size={15} /> Đăng xuất
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button 
+            type="button"
+            onClick={async () => {
+              setUploading(true);
+              setMessage('⏳ Đang kiểm tra kết nối và nạp toàn bộ dữ liệu bài viết, video, văn bản, ảnh BGH lên Supabase Cloud...');
+              const res = await syncAllDataToSupabase();
+              setUploading(false);
+              setMessage(res.message);
+            }} 
+            disabled={uploading}
+            style={{ background: '#16a34a', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <CheckCircle size={15} /> 🔄 ĐỒNG BỘ NẠP SUPABASE CLOUD
+          </button>
+
+          <button onClick={onLogout} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <LogOut size={15} /> Đăng xuất
+          </button>
+        </div>
       </div>
 
       {message && (
