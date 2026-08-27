@@ -24,7 +24,7 @@ import ContactView from './components/ContactView';
 import TrolyTinhocView from './components/TrolyTinhocView';
 import Footer from './components/Footer';
 import AIChatbotStudio from './components/AIChatbotStudio';
-import { supabase, uploadBase64ToSupabase, saveSiteConfigToSupabase } from './lib/supabaseClient';
+import { supabase, uploadBase64ToSupabase, saveSiteConfigToSupabase, SUPABASE_URL, SUPABASE_KEY } from './lib/supabaseClient';
 
 // Initial Fallback Site Config
 const INITIAL_SITE_CONFIG = {

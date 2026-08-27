@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Official Supabase Credentials for THCS Đồng Tân Portal (Active Project: miufsostxxqeoeljwzmi)
-const SUPABASE_URL = 'https://miufsostxxqeoeljwzmi.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdWZzb3N0eHhxZW9lbGp3em1pIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NjIzNTkzNSwiZXhwIjoyMTAxODExOTM1fQ.yMfSewDbAWHvzufsmdBiq10zkQ_XtS72G73jwrdMgeE';
+// Official Supabase Credentials for THCS Đồng Tân Portal (Active Project: mwhnntsojaxehyqoxapr)
+export const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL || 'https://mwhnntsojaxehyqoxapr.supabase.co';
+export const SUPABASE_KEY = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'sb_publishable_SM33ZXu1QD418n6q1Rpfng_T5xGbP';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
