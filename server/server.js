@@ -24,9 +24,9 @@ const PORT = process.env.PORT || 3001;
 // CORS Config
 app.use(cors());
 
-// Body Parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body Parser (Tăng giới hạn dung lượng nhận chuỗi ảnh Base64 lên 50MB)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Serve Uploaded Files Static Directory
 const uploadsPath = path.join(__dirname, 'uploads');

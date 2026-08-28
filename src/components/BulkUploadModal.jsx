@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, UploadCloud, Layers, CheckCircle, FileText, BookOpen, Image, AlertCircle, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { compressImageDataUrl } from '../utils/imageCompressor';
 
 export default function BulkUploadModal({ onClose, onBulkUploadSuccess }) {
   const [bulkType, setBulkType] = useState('resources'); // 'resources', 'docs', 'albums'
@@ -65,12 +66,16 @@ export default function BulkUploadModal({ onClose, onBulkUploadSuccess }) {
       setFileList(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'uploading' } : f));
 
       try {
-        const dataUrl = await new Promise((resolve, reject) => {
+        let dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
           reader.onerror = (e) => reject(e);
           reader.readAsDataURL(item.file);
         });
+
+        if (item.file.type.startsWith('image/')) {
+          dataUrl = await compressImageDataUrl(dataUrl, 900, 0.7);
+        }
 
         if (bulkType === 'resources') {
           batchItemsToInsert.push({
@@ -126,7 +131,13 @@ export default function BulkUploadModal({ onClose, onBulkUploadSuccess }) {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(item)
-            })
+            }).catch(() =>
+              fetch('http://127.0.0.1:3001/api/media/albums', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item)
+              })
+            )
           ));
         }
       } catch (err) {

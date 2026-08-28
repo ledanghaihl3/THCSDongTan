@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Upload, FilePlus, BookOpen, Newspaper, Image, Video, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { compressImageDataUrl } from '../utils/imageCompressor';
 
 // Robust YouTube ID Extractor
 function extractYouTubeId(urlOrId) {
@@ -36,10 +37,11 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
   const [author, setAuthor] = useState('Tổ Chuyên Môn');
 
   // File Upload Handler (Base64 Embedded File Storage for Global Cross-Device Access)
-  const handleFileUpload = (file) => {
+  const handleFileUpload = async (file) => {
     if (!file) return;
     setUploading(true);
     setFileName(file.name);
+    setMessage('Đang xử lý & tối ưu tệp...');
 
     if (file.size > 25 * 1024 * 1024) {
       setMessage('⚠️ Tệp tin vượt quá 25MB. Vui lòng chọn tệp nhỏ hơn hoặc dán link Google Drive!');
@@ -48,8 +50,14 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
+    reader.onload = async (e) => {
+      let dataUrl = e.target.result;
+      
+      // Compress if it is an image
+      if (file.type.startsWith('image/')) {
+        dataUrl = await compressImageDataUrl(dataUrl, 900, 0.7);
+      }
+      
       setFileUrl(dataUrl);
       setMessage(`✅ Đã đính kèm tệp: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
       setUploading(false);
@@ -177,7 +185,7 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
         externalLink: externalLink || ''
       };
 
-      // 1. Lưu vào Local SQLite Server
+      // 1. Lưu vào Local SQLite Server (thử cả proxy relative và 127.0.0.1 direct)
       try {
         await fetch('/api/media/albums', {
           method: 'POST',
@@ -191,7 +199,21 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
             fileUrl: newItem.fileUrl,
             externalLink: newItem.externalLink
           })
-        });
+        }).catch(() =>
+          fetch('http://127.0.0.1:3001/api/media/albums', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: newItem.title,
+              date: newItem.date,
+              photosCount: newItem.photosCount,
+              cover: newItem.cover,
+              description: newItem.description,
+              fileUrl: newItem.fileUrl,
+              externalLink: newItem.externalLink
+            })
+          })
+        );
       } catch (e) {
         console.warn('Lưu vào Local API thất bại:', e);
       }
