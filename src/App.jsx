@@ -748,18 +748,6 @@ export default function App() {
     }
   };
 
-  const handleDeleteAlbum = async (albumId) => {
-    setAlbums(prev => prev.filter(a => a.id !== albumId));
-    try {
-      await fetch(`/api/media/albums/${albumId}`, { method: 'DELETE' });
-    } catch (err) {}
-    if (supabase) {
-      try {
-        await supabase.from('albums').delete().eq('id', albumId);
-      } catch (err) {}
-    }
-  };
-
   const handleRegisterSuccess = (newPendingUser) => {
     setPendingUsers(prev => [newPendingUser, ...prev]);
     fetchCloudData();
@@ -935,6 +923,9 @@ export default function App() {
     try {
       const stored = JSON.parse(localStorage.getItem('portal_albums') || '[]');
       localStorage.setItem('portal_albums', JSON.stringify(stored.filter(a => a.id !== albumId)));
+    } catch (e) {}
+    try {
+      await fetch(`/api/media/albums/${albumId}`, { method: 'DELETE' }).catch(() => null);
     } catch (e) {}
     if (supabase) {
       try {

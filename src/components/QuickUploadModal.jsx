@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { X, Upload, FilePlus, BookOpen, Newspaper, Image, Video, CheckCircle } from 'lucide-react';
 import { supabase, uploadFileToSupabase } from '../lib/supabaseClient';
+import { compressImageDataUrl } from '../utils/imageCompressor';
 
 // Safe DB URL Formatter
 function getSafeDbFileUrl(url) {
   if (!url) return '';
-  if (url.startsWith('data:') && url.length > 100000) {
-    return 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&q=80';
-  }
   return url;
 }
 
@@ -49,6 +47,7 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
     if (!file) return;
     setUploading(true);
     setFileName(file.name);
+    setMessage('Đang xử lý & tối ưu tệp...');
 
     if (file.size > 25 * 1024 * 1024) {
       setMessage('⚠️ Tệp tin vượt quá 25MB. Vui lòng chọn tệp nhỏ hơn hoặc dán link Google Drive!');
@@ -69,12 +68,15 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
       console.warn('Supabase storage upload fallback to local reader:', err);
     }
 
-    // 2. Fallback sang FileReader mã hóa Base64
+    // 2. Fallback sang FileReader mã hóa Base64 và nén ảnh
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
+    reader.onload = async (e) => {
+      let dataUrl = e.target.result;
+      if (file.type && file.type.startsWith('image/')) {
+        dataUrl = await compressImageDataUrl(dataUrl, 800, 0.7);
+      }
       setFileUrl(dataUrl);
-      setMessage(`✅ Đã đính kèm tệp: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+      setMessage(`✅ Đã đính kèm & nén tối ưu tệp: ${file.name}`);
       setUploading(false);
     };
     reader.onerror = () => {
