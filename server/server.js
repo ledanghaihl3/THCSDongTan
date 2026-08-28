@@ -74,7 +74,7 @@ app.get('*', (req, res) => {
   }
 });
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`=======================================================`);
   console.log(`🚀 API Gateway & Backend Services THCS Đồng Tân`);
   console.log(`🌐 Website đang chạy tại: http://localhost:${PORT}`);

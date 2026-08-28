@@ -139,12 +139,61 @@ export default function App() {
   const [featuredNews, setFeaturedNews] = useState(INITIAL_FEATURED_NEWS);
   const [documents, setDocuments] = useState(INITIAL_DOCUMENTS);
   const [videos, setVideos] = useState(INITIAL_VIDEOS);
-  const [albums, setAlbums] = useState(INITIAL_ALBUMS);
+  const [albums, setAlbums] = useState(() => {
+    try {
+      const saved = localStorage.getItem('thcs_albums');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return INITIAL_ALBUMS;
+  });
   const [resources, setResources] = useState(INITIAL_RESOURCES);
   const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [announcements, setAnnouncements] = useState(INITIAL_ANNOUNCEMENTS);
+
+  // Tự động lưu Albums vào LocalStorage & Đồng bộ tức thì giữa các Tab/Trình duyệt
+  useEffect(() => {
+    if (albums && albums.length > 0) {
+      try {
+        localStorage.setItem('thcs_albums', JSON.stringify(albums));
+      } catch (e) {}
+    }
+  }, [albums]);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'thcs_albums' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAlbums(parsed);
+          }
+        } catch (err) {}
+      }
+    };
+
+    let channel = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        channel = new BroadcastChannel('thcs_portal_sync');
+        channel.onmessage = (event) => {
+          if (event.data?.type === 'SYNC_ALBUMS' && Array.isArray(event.data.payload)) {
+            setAlbums(event.data.payload);
+          }
+        };
+      } catch (e) {}
+    }
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      if (channel) channel.close();
+    };
+  }, []);
 
   // Modal States
   const [selectedArticleId, setSelectedArticleId] = useState(null);
@@ -269,8 +318,11 @@ export default function App() {
       // Hybrid Fallback: Nếu Supabase không có dữ liệu hoặc bị lỗi/khóa quota -> Tải từ Local SQLite API
       if (!loadedAlbums || loadedAlbums.length === 0) {
         try {
-          const res = await fetch('/api/media/albums');
-          if (res.ok) {
+          let res = await fetch('/api/media/albums').catch(() => null);
+          if (!res || !res.ok) {
+            res = await fetch('http://127.0.0.1:3001/api/media/albums').catch(() => null);
+          }
+          if (res && res.ok) {
             const result = await res.json();
             if (result.success && Array.isArray(result.data) && result.data.length > 0) {
               loadedAlbums = result.data.map(a => ({
@@ -290,8 +342,24 @@ export default function App() {
         }
       }
 
+      // Đọc tiếp từ LocalStorage nếu vẫn chưa có dữ liệu
+      if (!loadedAlbums || loadedAlbums.length === 0) {
+        try {
+          const saved = localStorage.getItem('thcs_albums');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              loadedAlbums = parsed;
+            }
+          }
+        } catch (e) {}
+      }
+
       if (loadedAlbums && loadedAlbums.length > 0) {
         setAlbums(loadedAlbums);
+        try {
+          localStorage.setItem('thcs_albums', JSON.stringify(loadedAlbums));
+        } catch (e) {}
       }
 
       if (schData && schData.length > 0) {
@@ -483,7 +551,18 @@ export default function App() {
       setFeaturedNews(newItem);
       setActiveTab('home');
     } else if (type === 'albums') {
-      setAlbums(prev => [newItem, ...prev]);
+      setAlbums(prev => {
+        const updated = [newItem, ...prev];
+        try {
+          localStorage.setItem('thcs_albums', JSON.stringify(updated));
+          if (typeof BroadcastChannel !== 'undefined') {
+            const bc = new BroadcastChannel('thcs_portal_sync');
+            bc.postMessage({ type: 'SYNC_ALBUMS', payload: updated });
+            bc.close();
+          }
+        } catch (e) {}
+        return updated;
+      });
       setActiveTab('albums');
     } else if (type === 'videos') {
       setVideos(prev => [newItem, ...prev]);
