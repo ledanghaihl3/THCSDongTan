@@ -132,6 +132,21 @@ export const initDb = async () => {
       )
     `);
 
+    // 7. Thư viện Albums ảnh (albums) table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS albums (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        date TEXT DEFAULT '08/08/2026',
+        photosCount INTEGER DEFAULT 10,
+        cover TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        fileUrl TEXT DEFAULT '',
+        externalLink TEXT DEFAULT '',
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Seed initial users if empty
     db.get('SELECT COUNT(*) as count FROM users', async (err, row) => {
       if (!err && row.count === 0) {
@@ -164,6 +179,22 @@ export const initDb = async () => {
         categories.forEach(c => {
           db.run(`INSERT INTO categories (name, slug, icon) VALUES (?, ?, ?)`, [c.name, c.slug, c.icon]);
         });
+      }
+    });
+
+    // Seed initial Albums if empty
+    db.get('SELECT COUNT(*) as count FROM albums', (err, row) => {
+      if (!err && row && row.count === 0) {
+        db.run(
+          `INSERT INTO albums (title, date, photosCount, cover, description) VALUES (?, ?, ?, ?, ?)`,
+          [
+            'Album: Lễ Khai giảng năm học 2026 - 2027 THCS Đồng Tân',
+            '05/09/2026',
+            18,
+            'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&q=80',
+            'Hình ảnh rực rỡ cờ hoa trong ngày hội Khai trường chào đón các em học sinh khối 6 mới trúng tuyển.'
+          ]
+        );
       }
     });
   });

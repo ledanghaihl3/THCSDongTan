@@ -169,7 +169,7 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
       newItem = {
         id: newItemId,
         title: title || 'Album ảnh hoạt động mới',
-        date: '08/08/2026',
+        date: new Date().toLocaleDateString('vi-VN'),
         photosCount: 10,
         cover: fileUrl || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&q=80',
         description: summary || title,
@@ -177,11 +177,32 @@ export default function QuickUploadModal({ defaultTab = 'docs', categories = [],
         externalLink: externalLink || ''
       };
 
+      // 1. Lưu vào Local SQLite Server
+      try {
+        await fetch('/api/media/albums', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: newItem.title,
+            date: newItem.date,
+            photosCount: newItem.photosCount,
+            cover: newItem.cover,
+            description: newItem.description,
+            fileUrl: newItem.fileUrl,
+            externalLink: newItem.externalLink
+          })
+        });
+      } catch (e) {
+        console.warn('Lưu vào Local API thất bại:', e);
+      }
+
+      // 2. Thử lưu thêm vào Supabase Cloud (nếu khả dụng)
       if (supabase) {
         try {
           await supabase.from('albums').insert([{
             title: newItem.title,
             date: newItem.date,
+            photos_count: newItem.photosCount,
             cover: newItem.cover,
             description: newItem.description,
             file_url: newItem.fileUrl,

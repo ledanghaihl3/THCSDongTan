@@ -117,7 +117,24 @@ export default function BulkUploadModal({ onClose, onBulkUploadSuccess }) {
       }
     }
 
-    // Insert batch items into Supabase Cloud Postgres
+    // 1. Insert batch items into Local Backend SQLite Server
+    if (batchItemsToInsert.length > 0) {
+      try {
+        if (bulkType === 'albums') {
+          await Promise.all(batchItemsToInsert.map(item =>
+            fetch('/api/media/albums', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(item)
+            })
+          ));
+        }
+      } catch (err) {
+        console.warn('Lỗi batch insert Local SQLite:', err);
+      }
+    }
+
+    // 2. Insert batch items into Supabase Cloud Postgres (nếu khả dụng)
     if (supabase && batchItemsToInsert.length > 0) {
       try {
         const tableName = bulkType === 'docs' ? 'documents' : (bulkType === 'resources' ? 'resources' : 'albums');

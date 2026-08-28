@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Image, Eye, Calendar, Sparkles } from 'lucide-react';
+import { Image, Eye, Calendar, Sparkles, Trash2 } from 'lucide-react';
 
-export default function AlbumsView({ albums = [] }) {
+export default function AlbumsView({ albums = [], onDeleteAlbum }) {
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const isAdminLoggedIn = Boolean(localStorage.getItem('adminToken'));
 
   const albumList = albums.length > 0 ? albums : [
     {
@@ -39,6 +41,15 @@ export default function AlbumsView({ albums = [] }) {
     }
   ];
 
+  const handleDelete = (e, albumId) => {
+    e.stopPropagation();
+    if (window.confirm('Thầy/Cô có chắc chắn muốn xóa album này không?')) {
+      if (onDeleteAlbum) {
+        onDeleteAlbum(albumId);
+      }
+    }
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1100px', margin: '0 auto' }}>
       <div className="widget-box">
@@ -52,14 +63,37 @@ export default function AlbumsView({ albums = [] }) {
             {albumList.map((album) => (
               <div 
                 key={album.id} 
-                style={{ border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', cursor: 'pointer' }}
+                style={{ border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', cursor: 'pointer', position: 'relative' }}
                 onClick={() => setSelectedImage(album)}
               >
                 <div style={{ position: 'relative' }}>
                   <img src={album.cover} alt={album.title} style={{ width: '100%', height: '170px', objectFit: 'cover' }} />
                   <span style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', color: 'white', fontSize: '11px', padding: '2px 8px', borderRadius: '10px' }}>
-                    📷 {album.photosCount} Ảnh
+                    📷 {album.photosCount || album.photos_count || 1} Ảnh
                   </span>
+                  {isAdminLoggedIn && onDeleteAlbum && (
+                    <button
+                      onClick={(e) => handleDelete(e, album.id)}
+                      title="Xóa Album này"
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: 'rgba(220, 38, 38, 0.85)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '28px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
                 <div style={{ padding: '12px' }}>
                   <h3 style={{ fontSize: '14px', fontWeight: '700', color: '#003a73', marginBottom: '6px', lineHeight: '1.3' }}>

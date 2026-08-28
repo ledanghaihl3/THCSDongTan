@@ -252,17 +252,46 @@ export default function App() {
         })));
       }
 
-      if (albData && albData.length > 0) {
-        setAlbums(albData.map(a => ({
+      let loadedAlbums = null;
+      if (albData && Array.isArray(albData) && albData.length > 0) {
+        loadedAlbums = albData.map(a => ({
           id: a.id,
           title: a.title,
           date: a.date,
-          photosCount: a.photos_count,
+          photosCount: a.photos_count || a.photosCount || 10,
           cover: a.cover,
           description: a.description,
-          fileUrl: a.file_url,
-          externalLink: a.external_link
-        })));
+          fileUrl: a.file_url || a.fileUrl,
+          externalLink: a.external_link || a.externalLink
+        }));
+      }
+
+      // Hybrid Fallback: Nếu Supabase không có dữ liệu hoặc bị lỗi/khóa quota -> Tải từ Local SQLite API
+      if (!loadedAlbums || loadedAlbums.length === 0) {
+        try {
+          const res = await fetch('/api/media/albums');
+          if (res.ok) {
+            const result = await res.json();
+            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+              loadedAlbums = result.data.map(a => ({
+                id: a.id,
+                title: a.title,
+                date: a.date,
+                photosCount: a.photosCount || a.photos_count || 10,
+                cover: a.cover,
+                description: a.description,
+                fileUrl: a.fileUrl || a.file_url,
+                externalLink: a.externalLink || a.external_link
+              }));
+            }
+          }
+        } catch (localErr) {
+          console.warn('Cổng Local API chưa sẵn sàng:', localErr);
+        }
+      }
+
+      if (loadedAlbums && loadedAlbums.length > 0) {
+        setAlbums(loadedAlbums);
       }
 
       if (schData && schData.length > 0) {
@@ -301,7 +330,27 @@ export default function App() {
         setPendingUsers(pendings);
       }
     } catch (err) {
-      console.error('Lỗi kết nối Supabase Cloud:', err);
+      console.error('Lỗi kết nối Supabase Cloud, đang tự động fallback về CSDL Local SQLite...', err);
+      try {
+        const res = await fetch('/api/media/albums');
+        if (res.ok) {
+          const result = await res.json();
+          if (result.success && Array.isArray(result.data) && result.data.length > 0) {
+            setAlbums(result.data.map(a => ({
+              id: a.id,
+              title: a.title,
+              date: a.date,
+              photosCount: a.photosCount || a.photos_count || 10,
+              cover: a.cover,
+              description: a.description,
+              fileUrl: a.fileUrl || a.file_url,
+              externalLink: a.externalLink || a.external_link
+            })));
+          }
+        }
+      } catch (localErr) {
+        console.warn('Lỗi kết nối CSDL Local SQLite:', localErr);
+      }
     }
   };
 
@@ -381,6 +430,18 @@ export default function App() {
     if (supabase) {
       try {
         await supabase.from('documents').delete().eq('id', docId);
+      } catch (err) {}
+    }
+  };
+
+  const handleDeleteAlbum = async (albumId) => {
+    setAlbums(prev => prev.filter(a => a.id !== albumId));
+    try {
+      await fetch(`/api/media/albums/${albumId}`, { method: 'DELETE' });
+    } catch (err) {}
+    if (supabase) {
+      try {
+        await supabase.from('albums').delete().eq('id', albumId);
       } catch (err) {}
     }
   };
@@ -538,7 +599,7 @@ export default function App() {
       ) : activeTab === 'intro' ? (
         <IntroView siteConfig={siteConfig} />
       ) : activeTab === 'albums' ? (
-        <AlbumsView albums={albums} />
+        <AlbumsView albums={albums} onDeleteAlbum={handleDeleteAlbum} />
       ) : activeTab === 'videos' ? (
         <VideosView videos={videos} onOpenUpload={handleOpenUpload} />
       ) : activeTab === 'resources' ? (
