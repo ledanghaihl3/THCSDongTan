@@ -41,7 +41,7 @@ export const get = async (sql, params = []) => {
 // Initialize database tables & seed initial data
 export const initDb = async () => {
   if (isSupabaseReady()) {
-    console.log('[Supabase Cloud] Đã kích hoạt cơ sở dữ liệu Supabase: https://miufsostxxqeoeljwzmi.supabase.co');
+    console.log('[Supabase Cloud] Đã kích hoạt cơ sở dữ liệu Supabase: https://mwhnntsojaxehyqoxapr.supabase.co');
   }
 
   db.serialize(async () => {
@@ -147,6 +147,40 @@ export const initDb = async () => {
       )
     `);
 
+    // 8. Quick Links table (Liên kết nhanh - Admin chỉnh sửa)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS quick_links (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        url TEXT NOT NULL,
+        target TEXT DEFAULT '_blank',
+        position TEXT DEFAULT 'footer',
+        sortOrder INTEGER DEFAULT 0,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Seed initial Quick Links if empty
+    db.get('SELECT COUNT(*) as count FROM quick_links', (err, row) => {
+      if (!err && row && row.count === 0) {
+        const defaultLinks = [
+          { title: 'Giới thiệu nhà trường', url: '#intro', target: '_self', position: 'footer', sortOrder: 1 },
+          { title: 'Tin tức - Sự kiện nổi bật', url: '#news', target: '_self', position: 'footer', sortOrder: 2 },
+          { title: 'Văn bản chỉ đạo & Quy chế', url: '#docs', target: '_self', position: 'footer', sortOrder: 3 },
+          { title: 'Kho Tài nguyên & Đề thi', url: '#resources', target: '_self', position: 'footer', sortOrder: 4 },
+          { title: 'Lịch công tác tuần', url: '#schedule', target: '_self', position: 'footer', sortOrder: 5 },
+          { title: 'Bộ Giáo Dục & Đào Tạo', url: 'http://moet.gov.vn', target: '_blank', position: 'sidebar', sortOrder: 6 },
+          { title: 'Sở GD&ĐT Tỉnh Lạng Sơn', url: 'https://langson.edu.vn', target: '_blank', position: 'sidebar', sortOrder: 7 },
+          { title: 'UBND Xã Hữu Lũng', url: 'https://huulung.langson.gov.vn', target: '_blank', position: 'sidebar', sortOrder: 8 }
+        ];
+        defaultLinks.forEach(item => {
+          db.run(
+            `INSERT INTO quick_links (title, url, target, position, sortOrder) VALUES (?, ?, ?, ?, ?)`,
+            [item.title, item.url, item.target, item.position, item.sortOrder]
+          );
+        });
+      }
+    });
     // Seed initial users if empty
     db.get('SELECT COUNT(*) as count FROM users', async (err, row) => {
       if (!err && row.count === 0) {

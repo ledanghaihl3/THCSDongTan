@@ -14,6 +14,7 @@ import documentsRoutes from './routes/documents.js';
 import mediaRoutes from './routes/media.js';
 import announcementsRoutes from './routes/announcements.js';
 import uploadRoutes from './routes/upload.js';
+import quickLinksRoutes from './routes/quick_links.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,7 @@ app.use('/api/documents', documentsRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/announcements', announcementsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/quick-links', quickLinksRoutes);
 
 // Healthcheck Route
 app.get('/api/health', (req, res) => {

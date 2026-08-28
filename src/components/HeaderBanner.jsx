@@ -4,12 +4,17 @@ export default function HeaderBanner({ siteConfig }) {
   const config = siteConfig || {};
   const schoolName = config.schoolName || 'TRƯỜNG THCS ĐỒNG TÂN';
   const governingBody = config.governingBody || 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN';
-  const slogan = config.slogan || 'HỘI TỤ - KẾT TINH - TỎA SÁNG';
-  const address = config.address || 'Xã Hữu Lũng - Tỉnh Lạng Sơn';
+  const rawSlogan = config.slogan || 'HỘI TỤ - KẾT TINH - TỎA SÁNG';
+  const slogan = rawSlogan.split('|||BGH_JSON:')[0];
+  let address = config.address || 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  if (!address || address.includes('Thôn Đồng Tân') || address.includes('Xã Đồng Tân')) {
+    address = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+  }
   const phone = config.phone || '(0205) 3885.6789';
   
   // Official school logo and background
-  const logoUrl = config.logoUrl || '/images/school-logo.jpg';
+  const rawLogoUrl = config.logoUrl || '/images/school-logo.jpg';
+  const logoUrl = rawLogoUrl.split('|||BGH_JSON:')[0];
   const bannerImage = config.bannerBg || '/images/school-banner.png';
   
   const bannerStyle = {

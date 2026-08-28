@@ -10,26 +10,55 @@ import DocumentDetailModal from './components/DocumentDetailModal';
 import QuickUploadModal from './components/QuickUploadModal';
 import BulkUploadModal from './components/BulkUploadModal';
 import RegisterModal from './components/RegisterModal';
+import ChangePasswordModal from './components/ChangePasswordModal';
+import LoginModal from './components/LoginModal';
 import AdminPortal from './components/AdminPortal';
+
+
 import IntroView from './components/IntroView';
 import AlbumsView from './components/AlbumsView';
 import VideosView from './components/VideosView';
 import ResourcesView from './components/ResourcesView';
 import ScheduleView from './components/ScheduleView';
 import ContactView from './components/ContactView';
+import TrolyTinhocView from './components/TrolyTinhocView';
 import Footer from './components/Footer';
-import { supabase } from './lib/supabaseClient';
+import AIChatbotStudio from './components/AIChatbotStudio';
+import { supabase, uploadBase64ToSupabase, saveSiteConfigToSupabase, SUPABASE_URL, SUPABASE_KEY } from './lib/supabaseClient';
 
 // Initial Fallback Site Config
 const INITIAL_SITE_CONFIG = {
   schoolName: 'TRƯỜNG THCS ĐỒNG TÂN',
   governingBody: 'ỦY BAN NHÂN DÂN XÃ HỮU LŨNG - TỈNH LẠNG SƠN',
   slogan: 'HỘI TỤ - KẾT TINH - TỎA SÁNG',
-  address: 'Xã Hữu Lũng - Tỉnh Lạng Sơn',
+  address: 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn',
   phone: '(0205) 3885.6789',
   email: 'thcsdongtan.huulung@langson.edu.vn',
   logoUrl: '/images/school-logo.jpg',
-  bannerBg: '/images/school-banner.png'
+  bannerBg: '/images/school-banner.png',
+  history: 'Trường THCS Đồng Tân được thành lập và phát triển trên địa bàn Xã Hữu Lũng, Tỉnh Lạng Sơn. Qua nhiều năm xây dựng và trưởng thành, nhà trường luôn phấn đấu đạt danh hiệu Trường học thân thiện, Học sinh tích cực, nâng cao chất lượng giáo dục toàn diện.',
+  mission: 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
+  vision: 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
+  principal: 'Thầy Hiệu Trưởng - THCS Đồng Tân',
+  principalAvatar: '/images/principal.jpg',
+  vicePrincipal: 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
+  vicePrincipalAvatar: '/images/vice-principal.jpg',
+
+  teamLeader1Name: 'Cô Nguyễn Thanh Mai',
+  teamLeader1Title: 'Tổ trưởng Tổ Toán - KHTN',
+  teamLeader1Avatar: '/images/team-leader-1.jpg',
+
+  teamLeader2Name: 'Cô Đặng Thị Thảo',
+  teamLeader2Title: 'Tổ trưởng Tổ Văn - KHXH',
+  teamLeader2Avatar: '/images/team-leader-2.jpg',
+
+  teamLeader3Name: 'Cô Phạm Thị Hằng',
+  teamLeader3Title: 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
+  teamLeader3Avatar: '/images/team-leader-3.jpg',
+
+  teamLeader4Name: 'Cô Hoàng Thị Chuyên',
+  teamLeader4Title: 'Tổ trưởng Tổ Hành Chính - Văn Thể',
+  teamLeader4Avatar: '/images/team-leader-4.jpg'
 };
 
 // Initial Fallback Data
@@ -133,15 +162,36 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Global Dynamic Site State
-  const [siteConfig, setSiteConfig] = useState(INITIAL_SITE_CONFIG);
-  const [newsList, setNewsList] = useState(INITIAL_NEWS_LIST);
+  // Global Dynamic Site State with LocalStorage Persistence for Offline Reliability
+  const [siteConfig, setSiteConfig] = useState(() => {
+    const saved = localStorage.getItem('portal_site_config');
+    let parsed = saved ? JSON.parse(saved) : INITIAL_SITE_CONFIG;
+    if (parsed && (parsed.address?.includes('Thôn Đồng Tân') || parsed.address?.includes('Xã Đồng Tân') || !parsed.address)) {
+      parsed.address = 'Thôn Ngọc Thành, xã Hữu Lũng, tỉnh Lạng Sơn';
+      localStorage.setItem('portal_site_config', JSON.stringify(parsed));
+    }
+    return parsed;
+  });
+
+  const [newsList, setNewsList] = useState(() => {
+    const saved = localStorage.getItem('portal_news');
+    return saved ? JSON.parse(saved) : INITIAL_NEWS_LIST;
+  });
+
   const [featuredNews, setFeaturedNews] = useState(INITIAL_FEATURED_NEWS);
-  const [documents, setDocuments] = useState(INITIAL_DOCUMENTS);
-  const [videos, setVideos] = useState(INITIAL_VIDEOS);
+  const [documents, setDocuments] = useState(() => {
+    const saved = localStorage.getItem('portal_docs');
+    return saved ? JSON.parse(saved) : INITIAL_DOCUMENTS;
+  });
+
+  const [videos, setVideos] = useState(() => {
+    const saved = localStorage.getItem('portal_videos');
+    return saved ? JSON.parse(saved) : INITIAL_VIDEOS;
+  });
+
   const [albums, setAlbums] = useState(() => {
     try {
-      const saved = localStorage.getItem('thcs_albums');
+      const saved = localStorage.getItem('portal_albums') || localStorage.getItem('thcs_albums');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -149,7 +199,11 @@ export default function App() {
     } catch (e) {}
     return INITIAL_ALBUMS;
   });
-  const [resources, setResources] = useState(INITIAL_RESOURCES);
+
+  const [resources, setResources] = useState(() => {
+    const saved = localStorage.getItem('portal_resources');
+    return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
+  });
   const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
@@ -202,21 +256,71 @@ export default function App() {
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [activeDocument, setActiveDocument] = useState(null);
 
-  // Quick Upload, Bulk Upload & Register Modal States
+  // Quick Upload, Bulk Upload, Register & Login Modal States
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [uploadDefaultTab, setUploadDefaultTab] = useState('docs');
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  // Admin Auth State
-  const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('adminUser') || 'null'));
+
+
+  // Admin Auth State - BGH và Admin bắt buộc phải gõ tài khoản & mật khẩu để đăng nhập
+  const [token, setToken] = useState('');
+  const [user, setUser] = useState(null);
+
+  // Sync states to LocalStorage
+  useEffect(() => {
+    localStorage.setItem('portal_site_config', JSON.stringify(siteConfig));
+  }, [siteConfig]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_videos', JSON.stringify(videos));
+  }, [videos]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_news', JSON.stringify(newsList));
+  }, [newsList]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_docs', JSON.stringify(documents));
+  }, [documents]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_resources', JSON.stringify(resources));
+  }, [resources]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_albums', JSON.stringify(albums));
+  }, [albums]);
+
+  useEffect(() => {
+    localStorage.setItem('portal_docs', JSON.stringify(documents));
+  }, [documents]);
+
 
   // Main Live Data Fetcher from Supabase Cloud Postgres
   const fetchCloudData = async () => {
     if (!supabase) return;
 
     try {
+      const fetchSiteConfigDirect = async () => {
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/site_config?id=eq.1`, {
+            headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (rows && rows.length > 0) return rows[0];
+          }
+        } catch (e) {}
+        return null;
+      };
+
       const [
         { data: artData },
         { data: docData },
@@ -224,7 +328,7 @@ export default function App() {
         { data: vidData },
         { data: albData },
         { data: schData },
-        { data: cfgData },
+        cfgData,
         { data: usrData }
       ] = await Promise.all([
         supabase.from('articles').select('*').order('id', { ascending: false }),
@@ -233,7 +337,7 @@ export default function App() {
         supabase.from('videos').select('*').order('id', { ascending: false }),
         supabase.from('albums').select('*').order('id', { ascending: false }),
         supabase.from('schedules').select('*').order('id', { ascending: false }),
-        supabase.from('site_config').select('*').eq('id', 1).maybeSingle(),
+        fetchSiteConfigDirect(),
         supabase.from('users').select('*').order('id', { ascending: false })
       ]);
 
@@ -373,19 +477,105 @@ export default function App() {
       }
 
       if (cfgData) {
-        setSiteConfig({
-          schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
-          governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
-          slogan: cfgData.slogan || INITIAL_SITE_CONFIG.slogan,
-          address: cfgData.address || INITIAL_SITE_CONFIG.address,
-          phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
-          email: cfgData.email || INITIAL_SITE_CONFIG.email,
-          logoUrl: cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl,
-          bannerBg: cfgData.banner_bg || INITIAL_SITE_CONFIG.bannerBg
+        // Tự động đồng bộ các bản lưu bị gián đoạn do Cloud 503
+        const pendingSave = localStorage.getItem('pending_site_config_save');
+        if (pendingSave) {
+          try {
+            const parsedPending = JSON.parse(pendingSave);
+            saveSiteConfigToSupabase(parsedPending.newConfig, parsedPending.bghPayload);
+          } catch (e) {}
+        }
+
+        let rawSlogan = cfgData.slogan || INITIAL_SITE_CONFIG.slogan;
+        let cleanSlogan = rawSlogan;
+        let rawLogoUrl = cfgData.logo_url || INITIAL_SITE_CONFIG.logoUrl;
+        let cleanLogoUrl = rawLogoUrl;
+        let bghData = {};
+
+        if (rawSlogan && rawSlogan.includes('|||BGH_JSON:')) {
+          const parts = rawSlogan.split('|||BGH_JSON:');
+          cleanSlogan = parts[0];
+          try {
+            bghData = { ...bghData, ...JSON.parse(parts[1]) };
+          } catch (e) {}
+        }
+
+        if (rawLogoUrl && rawLogoUrl.includes('|||BGH_JSON:')) {
+          const parts = rawLogoUrl.split('|||BGH_JSON:');
+          cleanLogoUrl = parts[0];
+          try {
+            bghData = { ...bghData, ...JSON.parse(parts[1]) };
+          } catch (e) {}
+        }
+
+        const isCustomUrl = (url) => typeof url === 'string' && url.length > 5 && !url.includes('images.unsplash.com');
+
+        setSiteConfig(prev => {
+          const merged = {
+            ...prev,
+            schoolName: cfgData.school_name || INITIAL_SITE_CONFIG.schoolName,
+            governingBody: cfgData.governing_body || INITIAL_SITE_CONFIG.governingBody,
+            slogan: cleanSlogan,
+            address: cfgData.address || INITIAL_SITE_CONFIG.address,
+            phone: cfgData.phone || INITIAL_SITE_CONFIG.phone,
+            email: cfgData.email || INITIAL_SITE_CONFIG.email,
+            logoUrl: cleanLogoUrl,
+            bannerBg: cfgData.banner_bg || cfgData.banner_url || INITIAL_SITE_CONFIG.bannerBg,
+            history: cfgData.history || INITIAL_SITE_CONFIG.history,
+            mission: cfgData.mission || INITIAL_SITE_CONFIG.mission,
+            vision: cfgData.vision || INITIAL_SITE_CONFIG.vision,
+
+            principal: bghData.principal || cfgData.principal || cfgData.principal_name || prev.principal || INITIAL_SITE_CONFIG.principal,
+            principalAvatar: isCustomUrl(bghData.principalAvatar) ? bghData.principalAvatar : (isCustomUrl(prev.principalAvatar) ? prev.principalAvatar : (bghData.principalAvatar || prev.principalAvatar || INITIAL_SITE_CONFIG.principalAvatar)),
+            vicePrincipal: bghData.vicePrincipal || cfgData.vice_principal || prev.vicePrincipal || INITIAL_SITE_CONFIG.vicePrincipal,
+            vicePrincipalAvatar: isCustomUrl(bghData.vicePrincipalAvatar) ? bghData.vicePrincipalAvatar : (isCustomUrl(prev.vicePrincipalAvatar) ? prev.vicePrincipalAvatar : (bghData.vicePrincipalAvatar || prev.vicePrincipalAvatar || INITIAL_SITE_CONFIG.vicePrincipalAvatar)),
+
+            teamLeader1Name: bghData.teamLeader1Name || cfgData.team_leader_1_name || prev.teamLeader1Name || INITIAL_SITE_CONFIG.teamLeader1Name,
+            teamLeader1Title: bghData.teamLeader1Title || cfgData.team_leader_1_title || prev.teamLeader1Title || INITIAL_SITE_CONFIG.teamLeader1Title,
+            teamLeader1Avatar: isCustomUrl(bghData.teamLeader1Avatar) ? bghData.teamLeader1Avatar : (isCustomUrl(prev.teamLeader1Avatar) ? prev.teamLeader1Avatar : (bghData.teamLeader1Avatar || prev.teamLeader1Avatar || INITIAL_SITE_CONFIG.teamLeader1Avatar)),
+
+            teamLeader2Name: bghData.teamLeader2Name || cfgData.team_leader_2_name || prev.teamLeader2Name || INITIAL_SITE_CONFIG.teamLeader2Name,
+            teamLeader2Title: bghData.teamLeader2Title || cfgData.team_leader_2_title || prev.teamLeader2Title || INITIAL_SITE_CONFIG.teamLeader2Title,
+            teamLeader2Avatar: isCustomUrl(bghData.teamLeader2Avatar) ? bghData.teamLeader2Avatar : (isCustomUrl(prev.teamLeader2Avatar) ? prev.teamLeader2Avatar : (bghData.teamLeader2Avatar || prev.teamLeader2Avatar || INITIAL_SITE_CONFIG.teamLeader2Avatar)),
+
+            teamLeader3Name: bghData.teamLeader3Name || cfgData.team_leader_3_name || prev.teamLeader3Name || INITIAL_SITE_CONFIG.teamLeader3Name,
+            teamLeader3Title: bghData.teamLeader3Title || cfgData.team_leader_3_title || prev.teamLeader3Title || INITIAL_SITE_CONFIG.teamLeader3Title,
+            teamLeader3Avatar: isCustomUrl(bghData.teamLeader3Avatar) ? bghData.teamLeader3Avatar : (isCustomUrl(prev.teamLeader3Avatar) ? prev.teamLeader3Avatar : (bghData.teamLeader3Avatar || prev.teamLeader3Avatar || INITIAL_SITE_CONFIG.teamLeader3Avatar)),
+
+            teamLeader4Name: bghData.teamLeader4Name || cfgData.team_leader_4_name || prev.teamLeader4Name || INITIAL_SITE_CONFIG.teamLeader4Name,
+            teamLeader4Title: bghData.teamLeader4Title || cfgData.team_leader_4_title || prev.teamLeader4Title || INITIAL_SITE_CONFIG.teamLeader4Title,
+            teamLeader4Avatar: isCustomUrl(bghData.teamLeader4Avatar) ? bghData.teamLeader4Avatar : (isCustomUrl(prev.teamLeader4Avatar) ? prev.teamLeader4Avatar : (bghData.teamLeader4Avatar || prev.teamLeader4Avatar || INITIAL_SITE_CONFIG.teamLeader4Avatar))
+          };
+          localStorage.setItem('portal_site_config', JSON.stringify(merged));
+          return merged;
         });
       }
 
       if (usrData && usrData.length > 0) {
+        // 1. Kiểm tra cưỡng chế đăng xuất nếu tài khoản hiện tại bị đổi mật khẩu ở thiết bị khác
+        const currentSavedUser = JSON.parse(localStorage.getItem('adminUser') || 'null');
+        if (currentSavedUser && currentSavedUser.username) {
+          const cleanUname = currentSavedUser.username.trim().toLowerCase();
+          const cloudMatch = usrData.find(u => u.username && u.username.trim().toLowerCase() === cleanUname);
+          if (cloudMatch && cloudMatch.password) {
+            const cachedPassword = localStorage.getItem('user_password_' + cleanUname);
+            if (cachedPassword && cloudMatch.password !== cachedPassword) {
+              console.log(`⚠️ Mật khẩu tài khoản ${cleanUname} đã bị thay đổi từ thiết bị khác. Cưỡng chế đăng xuất thiết bị này ngay lập tức!`);
+              handleLogout();
+              alert(`⚠️ CẢNH BÁO BẢO MẬT: Mật khẩu tài khoản "${cleanUname}" vừa được thay đổi từ một thiết bị khác. Hệ thống đã tự động đăng xuất thiết bị này để bảo mật. Vui lòng đăng nhập lại bằng mật khẩu mới!`);
+              return;
+            }
+          }
+        }
+
+        // 2. Tự động đồng bộ mật khẩu mới nhất từ Supabase Cloud vào LocalStorage thiết bị
+        usrData.forEach(u => {
+          if (u.username && u.password) {
+            const uname = u.username.trim().toLowerCase();
+            localStorage.setItem('user_password_' + uname, u.password);
+            localStorage.setItem('user_changed_password_' + uname, 'true');
+          }
+        });
         const pendings = usrData.filter(u => u.status === 'PENDING').map(u => ({
           id: u.id,
           username: u.username,
@@ -424,27 +614,83 @@ export default function App() {
 
   useEffect(() => {
     fetchCloudData();
-    const interval = setInterval(fetchCloudData, 10000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchCloudData, 2000);
+
+    let channel;
+    if (supabase) {
+      try {
+        channel = supabase
+          .channel('public_all_realtime_' + Date.now())
+          .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+            fetchCloudData();
+          })
+          .subscribe();
+      } catch (err) {}
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (supabase && channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   const handleSaveSiteConfig = async (newConfig) => {
-    setSiteConfig(newConfig);
-    if (supabase) {
-      try {
-        await supabase.from('site_config').upsert({
-          id: 1,
-          school_name: newConfig.schoolName,
-          governing_body: newConfig.governingBody,
-          slogan: newConfig.slogan,
-          address: newConfig.address,
-          phone: newConfig.phone,
-          email: newConfig.email,
-          logo_url: newConfig.logoUrl,
-          banner_bg: newConfig.bannerBg,
-          updated_at: new Date().toISOString()
-        });
-      } catch (err) {}
+    try {
+      const sanitizeAvatar = (url, defaultUrl) => {
+        if (!url) return defaultUrl;
+        if (typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/') || url.startsWith('data:image/'))) {
+          return url;
+        }
+        return defaultUrl;
+      };
+
+      // Tự động tải ảnh Base64 lên Supabase Storage nhận link HTTP công khai vĩnh viễn
+      const [pAv, vpAv, t1Av, t2Av, t3Av, t4Av] = await Promise.all([
+        uploadBase64ToSupabase(newConfig.principalAvatar).then(url => sanitizeAvatar(url || newConfig.principalAvatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.vicePrincipalAvatar).then(url => sanitizeAvatar(url || newConfig.vicePrincipalAvatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader1Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader1Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader2Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader2Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader3Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader3Avatar, '/images/school-logo.jpg')),
+        uploadBase64ToSupabase(newConfig.teamLeader4Avatar).then(url => sanitizeAvatar(url || newConfig.teamLeader4Avatar, '/images/school-logo.jpg'))
+      ]);
+
+      const bghPayload = {
+        principal: newConfig.principal,
+        principalAvatar: pAv,
+        vicePrincipal: newConfig.vicePrincipal,
+        vicePrincipalAvatar: vpAv,
+        teamLeader1Name: newConfig.teamLeader1Name || newConfig.teamLeader1 || 'Cô Nguyễn Thanh Mai',
+        teamLeader1Title: newConfig.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN',
+        teamLeader1Avatar: t1Av,
+        teamLeader2Name: newConfig.teamLeader2Name || newConfig.teamLeader2 || 'Cô Đặng Thị Thảo',
+        teamLeader2Title: newConfig.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH',
+        teamLeader2Avatar: t2Av,
+        teamLeader3Name: newConfig.teamLeader3Name || newConfig.teamLeader3 || 'Cô Phạm Thị Hằng',
+        teamLeader3Title: newConfig.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật',
+        teamLeader3Avatar: t3Av,
+        teamLeader4Name: newConfig.teamLeader4Name || newConfig.teamLeader4 || 'Cô Hoàng Thị Chuyên',
+        teamLeader4Title: newConfig.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể',
+        teamLeader4Avatar: t4Av
+      };
+
+      const updatedConfig = {
+        ...newConfig,
+        principalAvatar: pAv,
+        vicePrincipalAvatar: vpAv,
+        teamLeader1Avatar: t1Av,
+        teamLeader2Avatar: t2Av,
+        teamLeader3Avatar: t3Av,
+        teamLeader4Avatar: t4Av
+      };
+
+      setSiteConfig(updatedConfig);
+      localStorage.setItem('portal_site_config', JSON.stringify(updatedConfig));
+
+      await saveSiteConfigToSupabase(updatedConfig, bghPayload);
+    } catch (err) {
+      console.error('Lỗi lưu site_config Supabase:', err);
     }
   };
 
@@ -575,11 +821,22 @@ export default function App() {
   };
 
   const handleOpenUpload = (tab = 'docs') => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
     setUploadDefaultTab(tab);
     setShowUploadModal(true);
   };
 
-  const handleOpenBulkUpload = () => {
+  const [bulkDefaultTab, setBulkDefaultTab] = useState('albums');
+
+  const handleOpenBulkUpload = (type = 'albums') => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+    setBulkDefaultTab(type || 'albums');
     setShowBulkUploadModal(true);
   };
 
@@ -624,6 +881,100 @@ export default function App() {
     localStorage.removeItem('adminUser');
   };
 
+  const handleDeleteVideo = async (videoId) => {
+    setVideos(prev => prev.filter(v => v.id !== videoId));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_videos') || '[]');
+      localStorage.setItem('portal_videos', JSON.stringify(stored.filter(v => v.id !== videoId)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('videos').delete().eq('id', videoId);
+      } catch (err) {}
+    }
+  };
+
+  const handleUpdateVideo = async (updatedVid) => {
+    setVideos(prev => prev.map(v => v.id === updatedVid.id ? updatedVid : v));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_videos') || '[]');
+      localStorage.setItem('portal_videos', JSON.stringify(stored.map(v => v.id === updatedVid.id ? updatedVid : v)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('videos').update({
+          title: updatedVid.title,
+          youtube_id: updatedVid.youtubeId,
+          video_url: updatedVid.videoUrl,
+          thumbnail_url: updatedVid.thumbnailUrl
+        }).eq('id', updatedVid.id);
+      } catch (err) {}
+    }
+  };
+
+  const handleUpdateAlbum = async (updatedAlbum) => {
+    setAlbums(prev => prev.map(a => a.id === updatedAlbum.id ? updatedAlbum : a));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_albums') || '[]');
+      localStorage.setItem('portal_albums', JSON.stringify(stored.map(a => a.id === updatedAlbum.id ? updatedAlbum : a)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('albums').update({
+          title: updatedAlbum.title,
+          date: updatedAlbum.date,
+          cover: updatedAlbum.cover,
+          description: updatedAlbum.description
+        }).eq('id', updatedAlbum.id);
+      } catch (err) {}
+    }
+  };
+
+  const handleDeleteAlbum = async (albumId) => {
+    setAlbums(prev => prev.filter(a => a.id !== albumId));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_albums') || '[]');
+      localStorage.setItem('portal_albums', JSON.stringify(stored.filter(a => a.id !== albumId)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('albums').delete().eq('id', albumId);
+      } catch (err) {}
+    }
+  };
+
+  const handleUpdateResource = async (updatedRes) => {
+    setResources(prev => prev.map(r => r.id === updatedRes.id ? updatedRes : r));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_resources') || '[]');
+      localStorage.setItem('portal_resources', JSON.stringify(stored.map(r => r.id === updatedRes.id ? updatedRes : r)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('resources').update({
+          title: updatedRes.title,
+          type: updatedRes.type,
+          subject: updatedRes.subject,
+          author: updatedRes.author,
+          date: updatedRes.date
+        }).eq('id', updatedRes.id);
+      } catch (err) {}
+    }
+  };
+
+  const handleDeleteResource = async (resId) => {
+    setResources(prev => prev.filter(r => r.id !== resId));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_resources') || '[]');
+      localStorage.setItem('portal_resources', JSON.stringify(stored.filter(r => r.id !== resId)));
+    } catch (e) {}
+    if (supabase) {
+      try {
+        await supabase.from('resources').delete().eq('id', resId);
+      } catch (err) {}
+    }
+  };
+
   const handleSearch = async (query) => {
     if (!query) {
       fetchCloudData();
@@ -642,12 +993,19 @@ export default function App() {
         setActiveTab={(tab) => {
           setActiveTab(tab);
           setSelectedCategory(null);
+          fetchCloudData();
         }} 
+        user={user}
         onOpenAdmin={() => setActiveTab('admin')} 
         onOpenUpload={() => handleOpenUpload('docs')}
         onOpenBulkUpload={handleOpenBulkUpload}
+        onOpenLogin={() => setShowLoginModal(true)}
         onOpenRegister={() => setShowRegisterModal(true)}
+        onOpenChangePassword={() => setShowChangePasswordModal(true)}
+        onLogout={handleLogout}
       />
+
+
 
       <SubBar announcements={announcements} onSearch={handleSearch} />
 
@@ -665,6 +1023,8 @@ export default function App() {
             newsList={newsList}
             documents={documents}
             resources={resources}
+            videos={videos}
+            albums={albums}
             pendingUsers={pendingUsers}
             onApproveUser={handleApproveUser}
             onRejectUser={handleRejectUser}
@@ -677,12 +1037,17 @@ export default function App() {
         </div>
       ) : activeTab === 'intro' ? (
         <IntroView siteConfig={siteConfig} />
+      ) : activeTab === 'trolytinhoc' ? (
+        <TrolyTinhocView onOpenChatbot={() => {
+          const btn = document.querySelector('button[style*="pulseGlow"]');
+          if (btn) btn.click();
+        }} />
       ) : activeTab === 'albums' ? (
-        <AlbumsView albums={albums} onDeleteAlbum={handleDeleteAlbum} />
+        <AlbumsView albums={albums} user={user} onUpdateAlbum={handleUpdateAlbum} onDeleteAlbum={handleDeleteAlbum} />
       ) : activeTab === 'videos' ? (
-        <VideosView videos={videos} onOpenUpload={handleOpenUpload} />
+        <VideosView videos={videos} user={user} onOpenUpload={handleOpenUpload} onAddNewItem={handleAddNewItem} onUpdateVideo={handleUpdateVideo} onDeleteVideo={handleDeleteVideo} />
       ) : activeTab === 'resources' ? (
-        <ResourcesView resources={resources} onOpenUpload={handleOpenUpload} onOpenBulkUpload={handleOpenBulkUpload} />
+        <ResourcesView resources={resources} user={user} onOpenUpload={handleOpenUpload} onOpenBulkUpload={handleOpenBulkUpload} onUpdateResource={handleUpdateResource} onDeleteResource={handleDeleteResource} />
       ) : activeTab === 'schedule' ? (
         <ScheduleView schedule={schedules} />
       ) : activeTab === 'contact' ? (
@@ -693,20 +1058,29 @@ export default function App() {
             <div className="widget-header orange" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>📄 TRA CỨU VĂN BẢN CHỈ ĐẠO & QUY CHẾ THCS ĐỒNG TÂN</span>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
+              {user ? (
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    style={{ background: '#16a34a', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
+                    onClick={() => handleOpenUpload('docs')}
+                  >
+                    📤 TẢI VĂN BẢN MỚI LÊN
+                  </button>
+                  <button 
+                    style={{ background: '#0284c7', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
+                    onClick={() => handleOpenBulkUpload('docs')}
+                  >
+                    📦 TẢI LÊN HÀNG LOẠT
+                  </button>
+                </div>
+              ) : (
                 <button 
-                  style={{ background: '#16a34a', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
-                  onClick={() => handleOpenUpload('docs')}
+                  style={{ background: '#0056a6', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
+                  onClick={() => setShowLoginModal(true)}
                 >
-                  📤 TẢI VĂN BẢN MỚI LÊN
+                  🔒 ĐĂNG NHẬP ĐỂ ĐĂNG VĂN BẢN
                 </button>
-                <button 
-                  style={{ background: '#0284c7', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
-                  onClick={handleOpenBulkUpload}
-                >
-                  📦 TẢI LÊN HÀNG LOẠT
-                </button>
-              </div>
+              )}
             </div>
             <div className="widget-body">
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -723,12 +1097,27 @@ export default function App() {
                         📅 Ban hành: {doc.issueDate} | ✍️ Người ký: {doc.signer} | 📂 {doc.category}
                       </div>
                     </div>
-                    <button 
-                      style={{ background: '#0284c7', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', whiteSpace: 'nowrap' }}
-                      onClick={() => handleSelectDocument(doc.id)}
-                    >
-                      Xem & Tải về
-                    </button>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      {user && (user.role === 'BGH' || user.role === 'ADMIN') && (
+                        <button 
+                          onClick={() => {
+                            if (window.confirm(`Thầy/Cô có chắc muốn xóa văn bản: "${doc.title}"?`)) {
+                              handleDeleteDocument(doc.id);
+                            }
+                          }}
+                          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '12px' }}
+                        >
+                          🗑️ Xóa
+                        </button>
+                      )}
+                      <button 
+                        style={{ background: '#0284c7', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', whiteSpace: 'nowrap' }}
+                        onClick={() => handleSelectDocument(doc.id)}
+                      >
+                        Xem & Tải về
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -797,10 +1186,21 @@ export default function App() {
       {/* NEW Bulk Upload Popup Modal */}
       {showBulkUploadModal && (
         <BulkUploadModal 
+          initialBulkType={bulkDefaultTab}
           onClose={() => setShowBulkUploadModal(false)}
-          onBulkUploadSuccess={() => {
-            fetchCloudData();
-            setShowBulkUploadModal(false);
+          onBulkUploadSuccess={(bType, newItems) => {
+            if (newItems && newItems.length > 0) {
+              if (bType === 'albums') {
+                setAlbums(prev => [...newItems, ...prev]);
+                setActiveTab('albums');
+              } else if (bType === 'docs') {
+                setDocuments(prev => [...newItems, ...prev]);
+                setActiveTab('documents');
+              } else if (bType === 'resources') {
+                setResources(prev => [...newItems, ...prev]);
+                setActiveTab('resources');
+              }
+            }
           }}
         />
       )}
@@ -812,6 +1212,44 @@ export default function App() {
           onRegisterSuccess={handleRegisterSuccess}
         />
       )}
+
+      {/* Member Login Modal */}
+      {showLoginModal && (
+        <LoginModal 
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={(newToken, newUser) => {
+            handleLoginSuccess(newToken, newUser);
+            setShowLoginModal(false);
+          }}
+          onOpenRegister={() => {
+            setShowLoginModal(false);
+            setShowRegisterModal(true);
+          }}
+        />
+      )}
+
+      {/* Change Password Modal */}
+      {showChangePasswordModal && (
+        <ChangePasswordModal 
+          user={user} 
+          onClose={() => setShowChangePasswordModal(false)} 
+          onSuccess={() => setShowChangePasswordModal(false)}
+        />
+      )}
+
+
+      {/* AI Chatbot Studio Assistant Widget */}
+      <AIChatbotStudio 
+        siteConfig={siteConfig} 
+        newsList={newsList} 
+        documents={documents} 
+        schedules={schedules} 
+        resources={resources} 
+        onOpenTab={(tabKey) => {
+          setActiveTab(tabKey);
+          setSelectedCategory(null);
+        }}
+      />
 
       <Footer siteConfig={siteConfig} />
     </div>

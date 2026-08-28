@@ -1,17 +1,42 @@
 import React from 'react';
-import { Award, Users, BookOpen, MapPin, CheckCircle } from 'lucide-react';
+import { Award, Users, BookOpen, MapPin, CheckCircle, UserCheck } from 'lucide-react';
 
-export default function IntroView({ introData }) {
+export default function IntroView({ siteConfig, introData }) {
   const intro = introData || {
-    history: 'Trường THCS Đồng Tân được thành lập và phát triển trên địa bàn Xã Hữu Lũng, Tỉnh Lạng Sơn. Qua nhiều năm xây dựng và trưởng thành, nhà trường luôn phấn đấu đạt danh hiệu Trường học thân thiện, Học sinh tích cực, nâng cao chất lượng giáo dục toàn diện.',
-    mission: 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
-    vision: 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
-    principal: 'Thầy Hiệu Trưởng - THCS Đồng Tân',
-    vicePrincipal: 'Cô Phó Hiệu Trưởng - THCS Đồng Tân',
-    totalTeachers: 35,
-    totalStudents: 520,
-    classes: 14
+    history: siteConfig?.history || 'Trường THCS Đồng Tân được thành lập và phát triển trên địa bàn Xã Hữu Lũng, Tỉnh Lạng Sơn. Qua nhiều năm xây dựng và trưởng thành, nhà trường luôn phấn đấu đạt danh hiệu Trường học thân thiện, Học sinh tích cực, nâng cao chất lượng giáo dục toàn diện.',
+    mission: siteConfig?.mission || 'Xây dựng môi trường giáo dục kỷ cương, tình thương, trách nhiệm; giúp học sinh phát triển toàn diện cả về trí tuệ, thể chất và đạo đức.',
+    vision: siteConfig?.vision || 'Phấn đấu trở thành trường Trung học cơ sở đạt chuẩn quốc gia cấp độ cao, đi đầu trong chuyển đổi số giáo dục tại Tỉnh Lạng Sơn.',
+    totalTeachers: siteConfig?.totalTeachers || 35,
+    totalStudents: siteConfig?.totalStudents || 520,
+    classes: siteConfig?.classes || 14
   };
+  const principal = siteConfig?.principal || 'Thầy Hiệu Trưởng - THCS Đồng Tân';
+  const principalAvatar = siteConfig?.principalAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80';
+  const vicePrincipal = siteConfig?.vicePrincipal || 'Cô Phó Hiệu Trưởng - THCS Đồng Tân';
+  const vicePrincipalAvatar = siteConfig?.vicePrincipalAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80';
+
+  const teamLeaders = [
+    { 
+      name: siteConfig?.teamLeader1Name || siteConfig?.teamLeader1 || 'Cô Nguyễn Thanh Mai', 
+      title: siteConfig?.teamLeader1Title || 'Tổ trưởng Tổ Toán - KHTN', 
+      avatar: siteConfig?.teamLeader1Avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader2Name || siteConfig?.teamLeader2 || 'Cô Đặng Thị Thảo', 
+      title: siteConfig?.teamLeader2Title || 'Tổ trưởng Tổ Văn - KHXH', 
+      avatar: siteConfig?.teamLeader2Avatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader3Name || siteConfig?.teamLeader3 || 'Cô Phạm Thị Hằng', 
+      title: siteConfig?.teamLeader3Title || 'Tổ trưởng Tổ Ngoại Ngữ - Nghệ Thuật', 
+      avatar: siteConfig?.teamLeader3Avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80' 
+    },
+    { 
+      name: siteConfig?.teamLeader4Name || siteConfig?.teamLeader4 || 'Cô Hoàng Thị Chuyên', 
+      title: siteConfig?.teamLeader4Title || 'Tổ trưởng Tổ Hành Chính - Văn Thể', 
+      avatar: siteConfig?.teamLeader4Avatar || 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&q=80' 
+    }
+  ];
 
   return (
     <div style={{ padding: '20px', maxWidth: '1100px', margin: '0 auto' }}>
@@ -66,26 +91,61 @@ export default function IntroView({ introData }) {
             </div>
           </div>
 
-          {/* Cơ cấu Tổ chức Ban Giám Hiệu */}
-          <h2 style={{ fontSize: '18px', color: '#003a73', marginBottom: '15px', borderBottom: '2px solid #0284c7', paddingBottom: '6px' }}>
-            Ban Giám Hiệu & Tổ Chuyên Môn
+          {/* Ban Giám Hiệu */}
+          <h2 style={{ fontSize: '18px', color: '#003a73', marginBottom: '15px', borderBottom: '2px solid #0284c7', paddingBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Users size={20} /> BAN GIÁM HIỆU NHÀ TRƯỜNG
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
-            <div style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '15px', textAlign: 'center', background: '#ffffff' }}>
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&q=80" alt="BGH" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto' }} />
-              <h4 style={{ fontSize: '14px', color: '#003a73' }}>{intro.principal}</h4>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>Hiệu Trưởng Nhà Trường</span>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+            <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
+              <img 
+                src={principalAvatar} 
+                alt="Hiệu Trưởng" 
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%230056a6"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                }}
+                style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #0056a6' }} 
+              />
+              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{principal}</h4>
+              <span style={{ fontSize: '12.5px', color: '#0284c7', fontWeight: '700', background: '#e0f2fe', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Hiệu Trưởng Nhà Trường</span>
             </div>
-            <div style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '15px', textAlign: 'center', background: '#ffffff' }}>
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80" alt="BGH" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto' }} />
-              <h4 style={{ fontSize: '14px', color: '#003a73' }}>{intro.vicePrincipal}</h4>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>Phó Hiệu Trưởng Chuyên Môn</span>
+            <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#ffffff', boxShadow: '0 2px 5px rgba(0,0,0,0.03)' }}>
+              <img 
+                src={vicePrincipalAvatar} 
+                alt="Phó Hiệu Trưởng" 
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%2316a34a"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                }}
+                style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '3px solid #16a34a' }} 
+              />
+              <h4 style={{ fontSize: '15px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{vicePrincipal}</h4>
+              <span style={{ fontSize: '12.5px', color: '#16a34a', fontWeight: '700', background: '#dcfce7', padding: '3px 10px', borderRadius: '12px', display: 'inline-block' }}>Phó Hiệu Trưởng Chuyên Môn</span>
             </div>
-            <div style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '15px', textAlign: 'center', background: '#ffffff' }}>
-              <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&q=80" alt="BGH" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto' }} />
-              <h4 style={{ fontSize: '14px', color: '#003a73' }}>Tổ Tự Nhiên & Tổ Xã Hội</h4>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600' }}>Cán bộ Tổ trưởng Bộ môn</span>
-            </div>
+          </div>
+
+          {/* Các Tổ Trưởng Chuyên Môn (4 Tổ Trưởng) */}
+          <h2 style={{ fontSize: '18px', color: '#003a73', marginBottom: '15px', borderBottom: '2px solid #0284c7', paddingBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <UserCheck size={20} /> CÁC TỔ TRƯỜNG CHUYÊN MÔN (4 TỔ TRƯỜNG)
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
+            {teamLeaders.map((leader, index) => (
+              <div key={index} style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', textAlign: 'center', background: '#f8fafc', transition: 'transform 0.2s ease' }}>
+                <img 
+                  src={leader.avatar || '/images/school-logo.jpg'} 
+                  alt={leader.name} 
+                  onError={(e) => { 
+                    e.target.onerror = null; 
+                    e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="%23d97706"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                  }}
+                  style={{ width: '75px', height: '75px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 10px auto', border: '2px solid #d97706' }} 
+                />
+                <h4 style={{ fontSize: '14px', color: '#003a73', margin: '0 0 4px 0', fontWeight: '700' }}>{leader.name}</h4>
+                <span style={{ fontSize: '12px', color: '#b45309', fontWeight: '600', background: '#fef3c7', padding: '2px 8px', borderRadius: '10px', display: 'inline-block' }}>
+                  {leader.title}
+                </span>
+              </div>
+            ))}
           </div>
 
         </div>

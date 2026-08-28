@@ -6,6 +6,18 @@ import { JWT_SECRET, authGuard } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Helper so sánh mật khẩu an toàn (Hỗ trợ cả bcrypt hash và mật khẩu chưa mã hóa)
+async function verifyPassword(inputPassword, storedPassword) {
+  if (!inputPassword || !storedPassword) return false;
+  if (storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$')) {
+    try {
+      const match = await bcrypt.compare(inputPassword, storedPassword);
+      if (match) return true;
+    } catch (e) {}
+  }
+  return inputPassword === storedPassword;
+}
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
@@ -23,10 +35,11 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ success: false, message: 'Tài khoản của bạn đang chờ Admin duyệt' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await verifyPassword(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Tài khoản hoặc mật khẩu không chính xác' });
     }
+
 
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role, fullName: user.fullName },
@@ -145,6 +158,55 @@ router.delete('/users/:id', async (req, res) => {
     res.json({ success: true, message: 'Đã xóa tài khoản thành viên' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi khi xóa tài khoản' });
+  }
+});
+
+// POST /api/auth/change-password (Thành viên / Admin tự đổi mật khẩu cá nhân)
+router.post('/change-password', async (req, res) => {
+  try {
+    const { userId, username, currentPassword, newPassword } = req.body;
+    if ((!userId && !username) || !newPassword) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin mật khẩu' });
+    }
+
+    const targetUser = username || (userId ? 'admin' : '');
+    const user = targetUser
+      ? await get('SELECT * FROM users WHERE username = ? OR id = ?', [targetUser, userId])
+      : null;
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    if (user) {
+      await run('UPDATE users SET password = ? WHERE id = ?', [hashedNewPassword, user.id]);
+    } else {
+      await run('UPDATE users SET password = ? WHERE username = ?', [hashedNewPassword, targetUser]);
+    }
+
+    res.json({ success: true, message: 'Đổi mật khẩu tài khoản thành công!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi đổi mật khẩu', error: err.message });
+  }
+});
+
+// POST /api/auth/reset-password/:id (Admin trực tiếp đặt lại mật khẩu cho thành viên bất kỳ)
+router.post('/reset-password/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập mật khẩu mới' });
+    }
+
+    const user = await get('SELECT id, username, fullName FROM users WHERE id = ?', [id]);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Tài khoản không tồn tại' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await run('UPDATE users SET password = ? WHERE id = ?', [hashedNewPassword, id]);
+
+    res.json({ success: true, message: `Đã đặt lại mật khẩu thành công cho tài khoản ${user.fullName} (${user.username})!` });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi server khi đặt lại mật khẩu', error: err.message });
   }
 });
 
