@@ -889,9 +889,19 @@ export default function AdminPortal({
         <div style={{ display: 'grid', gap: '25px' }}>
           {/* Section 1: Danh sách Đăng ký Chờ Duyệt */}
           <div style={{ border: '1px solid #fecaca', background: '#fff5f5', padding: '15px', borderRadius: '6px' }}>
-            <h3 style={{ fontSize: '15px', color: '#991b1b', fontWeight: '700', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Bell size={18} color="#dc2626" /> YÊU CẦU ĐĂNG KÝ TÀI KHOẢN ĐANG CHỜ DUYỆT ({pendingList.length})
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '15px', color: '#991b1b', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                <Bell size={18} color="#dc2626" /> YÊU CẦU ĐĂNG KÝ TÀI KHOẢN ĐANG CHỜ DUYỆT ({pendingList.length})
+              </h3>
+              <button
+                type="button"
+                onClick={fetchUsers}
+                style={{ background: '#dc2626', color: 'white', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Bấm để cập nhật lại danh sách đăng ký mới nhất từ Cloud & Thiết bị"
+              >
+                🔄 LÀM TƯƠI DANH SÁCH DUYỆT
+              </button>
+            </div>
             {pendingList.length === 0 ? (
               <p style={{ fontSize: '13px', color: '#15803d', fontStyle: 'italic' }}>
                 🎉 Hiện không có yêu cầu đăng ký tài khoản mới nào đang chờ duyệt.
