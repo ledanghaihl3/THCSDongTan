@@ -205,7 +205,12 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_RESOURCES;
   });
   const [schedules, setSchedules] = useState(INITIAL_SCHEDULES);
-  const [pendingUsers, setPendingUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('portal_pending_users');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) { return []; }
+  });
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [announcements, setAnnouncements] = useState(INITIAL_ANNOUNCEMENTS);
 

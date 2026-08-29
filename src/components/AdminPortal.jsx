@@ -145,80 +145,149 @@ export default function AdminPortal({
   const [docFileUrl, setDocFileUrl] = useState('');
   const [docExternalLink, setDocExternalLink] = useState('');
 
-  // Fetch all users directly from Supabase Cloud Postgres
+  // Fetch all users directly from Supabase Cloud Postgres + LocalStorage fallback
   const fetchUsers = async () => {
-    if (!supabase) return;
-    try {
-      const { data: usersData, error } = await supabase.from('users').select('*').order('id', { ascending: false });
-      if (!error && usersData && usersData.length > 0) {
-        const actives = usersData.filter(u => u.status === 'ACTIVE').map(u => ({
-          id: u.id,
-          username: u.username,
-          fullName: u.full_name || u.fullName || u.username,
-          role: u.role || 'GIAO_VIEN',
-          email: u.email || '',
-          status: u.status,
-          createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
-        }));
-        const pendings = usersData.filter(u => u.status === 'PENDING' || u.status === 'PENDING_APPROVAL').map(u => ({
-          id: u.id,
-          username: u.username,
-          fullName: u.full_name || u.fullName || u.username,
-          role: u.role || 'HOC_SINH',
-          email: u.email || '',
-          status: u.status,
-          createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
-        }));
-        setUserList(actives);
-        setPendingList(pendings);
-      } else {
-        // Fallbacks
-        setUserList([
-          { id: 1, username: 'admin', fullName: 'Thầy Hiệu Trưởng - THCS Đồng Tân', role: 'BGH', email: 'bgh.thcsdongtan@langson.edu.vn', status: 'ACTIVE', createdAt: '08/08/2026' },
-          { id: 2, username: 'giaovien', fullName: 'Cô Nguyễn Thị Hoa - Giáo Viên Văn', role: 'GIAO_VIEN', email: 'hoanguyen@thcsdongtan.edu.vn', status: 'ACTIVE', createdAt: '08/08/2026' }
-        ]);
-        setPendingList(pendingUsers);
+    let cloudActives = [];
+    let cloudPendings = [];
+
+    if (supabase) {
+      try {
+        const { data: usersData, error } = await supabase.from('users').select('*').order('id', { ascending: false });
+        if (!error && usersData && usersData.length > 0) {
+          cloudActives = usersData.filter(u => u.status === 'ACTIVE' || u.status === 'APPROVED').map(u => ({
+            id: u.id,
+            username: u.username,
+            password: u.password,
+            fullName: u.full_name || u.fullName || u.username,
+            role: u.role || 'GIAO_VIEN',
+            email: u.email || '',
+            status: 'ACTIVE',
+            createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
+          }));
+          cloudPendings = usersData.filter(u => u.status === 'PENDING' || u.status === 'PENDING_APPROVAL').map(u => ({
+            id: u.id,
+            username: u.username,
+            password: u.password,
+            fullName: u.full_name || u.fullName || u.username,
+            role: u.role || 'HOC_SINH',
+            email: u.email || '',
+            status: u.status,
+            createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
+          }));
+        }
+      } catch (err) {
+        console.error('Lỗi lấy danh sách người dùng từ Supabase:', err);
       }
-    } catch (err) {
-      console.error('Lỗi lấy danh sách người dùng từ Supabase:', err);
     }
+
+    // Combine with LocalStorage pending registrations
+    let localPendings = [];
+    try {
+      localPendings = JSON.parse(localStorage.getItem('portal_pending_users') || '[]');
+    } catch (e) {}
+    if (pendingUsers && pendingUsers.length > 0) {
+      localPendings = [...localPendings, ...pendingUsers];
+    }
+
+    const combinedPendings = [...cloudPendings];
+    localPendings.forEach(lp => {
+      if (lp && lp.username) {
+        const uname = lp.username.trim().toLowerCase();
+        const existsInPending = combinedPendings.some(cp => cp.username && cp.username.trim().toLowerCase() === uname);
+        const existsInActive = cloudActives.some(ca => ca.username && ca.username.trim().toLowerCase() === uname);
+        if (!existsInPending && !existsInActive) {
+          combinedPendings.push({
+            id: lp.id || Date.now(),
+            username: lp.username,
+            password: lp.password,
+            fullName: lp.fullName || lp.full_name || lp.username,
+            role: lp.role || 'HOC_SINH',
+            email: lp.email || '',
+            status: 'PENDING',
+            createdAt: lp.createdAt || new Date().toLocaleDateString('vi-VN')
+          });
+        }
+      }
+    });
+
+    const defaultActives = [
+      { id: 1, username: 'admin', fullName: 'Thầy Hiệu Trưởng - THCS Đồng Tân', role: 'BGH', email: 'bgh.thcsdongtan@langson.edu.vn', status: 'ACTIVE', createdAt: '08/08/2026' },
+      { id: 2, username: 'giaovien', fullName: 'Cô Nguyễn Thị Hoa - Giáo Viên Văn', role: 'GIAO_VIEN', email: 'hoanguyen@thcsdongtan.edu.vn', status: 'ACTIVE', createdAt: '08/08/2026' }
+    ];
+
+    setUserList(cloudActives.length > 0 ? cloudActives : defaultActives);
+    setPendingList(combinedPendings);
   };
 
   useEffect(() => {
     fetchUsers();
   }, [token, pendingUsers]);
 
-  // Handle Approve User
+  // Handle Approve User (Phê duyệt và Kích hoạt tài khoản)
   const handleApproveUserClick = async (pendingUser) => {
     if (supabase) {
       try {
-        await supabase.from('users').update({ status: 'ACTIVE' }).eq('id', pendingUser.id);
-      } catch (err) {}
+        // Cập nhật hoặc Thêm mới trên Supabase Postgres với status ACTIVE theo username
+        const { data: existing } = await supabase.from('users').select('id').eq('username', pendingUser.username);
+        if (existing && existing.length > 0) {
+          await supabase.from('users').update({ status: 'ACTIVE' }).eq('username', pendingUser.username);
+        } else {
+          await supabase.from('users').insert([{
+            username: pendingUser.username,
+            password: pendingUser.password,
+            full_name: pendingUser.fullName,
+            role: pendingUser.role,
+            status: 'ACTIVE'
+          }]);
+        }
+      } catch (err) {
+        console.error('Lỗi phê duyệt tài khoản Supabase:', err);
+      }
     }
 
-    const approved = { ...pendingUser, status: 'ACTIVE' };
-    setUserList(prev => [approved, ...prev]);
-    setPendingList(prev => prev.filter(u => u.id !== pendingUser.id));
+    // Xóa khỏi portal_pending_users LocalStorage
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_pending_users') || '[]');
+      const updated = stored.filter(u => u.username !== pendingUser.username);
+      localStorage.setItem('portal_pending_users', JSON.stringify(updated));
+    } catch (e) {}
 
-    if (onApproveUser) onApproveUser(pendingUser.id);
+    const approved = { ...pendingUser, status: 'ACTIVE' };
+    setUserList(prev => [approved, ...prev.filter(u => u.username !== pendingUser.username)]);
+    setPendingList(prev => prev.filter(u => u.username !== pendingUser.username));
+
+    if (onApproveUser) onApproveUser(pendingUser.id || pendingUser.username);
     fetchUsers();
-    setMessage(`✅ Đã phê duyệt và kích hoạt tài khoản thành công trên Supabase cho: ${pendingUser.fullName} (${pendingUser.username})`);
+    setMessage(`✅ Đã phê duyệt và kích hoạt tài khoản thành công trên Supabase Cloud cho: ${pendingUser.fullName} (${pendingUser.username})`);
   };
 
   // Handle Reject / Delete User
-  const handleRejectUserClick = async (userId) => {
+  const handleRejectUserClick = async (userObj) => {
+    const targetId = typeof userObj === 'object' ? userObj.id : userObj;
+    const targetUname = typeof userObj === 'object' ? userObj.username : null;
+
     if (supabase) {
       try {
-        await supabase.from('users').delete().eq('id', userId);
+        if (targetUname) {
+          await supabase.from('users').delete().eq('username', targetUname);
+        } else if (targetId) {
+          await supabase.from('users').delete().eq('id', targetId);
+        }
       } catch (err) {}
     }
 
-    setPendingList(prev => prev.filter(u => u.id !== userId));
-    setUserList(prev => prev.filter(u => u.id !== userId));
+    try {
+      const stored = JSON.parse(localStorage.getItem('portal_pending_users') || '[]');
+      const updated = stored.filter(u => u.id !== targetId && u.username !== targetUname);
+      localStorage.setItem('portal_pending_users', JSON.stringify(updated));
+    } catch (e) {}
 
-    if (onRejectUser) onRejectUser(userId);
+    setPendingList(prev => prev.filter(u => u.id !== targetId && u.username !== targetUname));
+    setUserList(prev => prev.filter(u => u.id !== targetId && u.username !== targetUname));
+
+    if (onRejectUser) onRejectUser(targetId);
     fetchUsers();
-    setMessage('✅ Đã từ chối / xóa đăng ký tài khoản thành viên thành công');
+    setMessage('✅ Đã từ chối / xóa tài khoản thành công');
   };
 
   // Handle Direct Account Creation by Admin

@@ -61,14 +61,14 @@ export default function RegisterModal({ onClose, onRegisterSuccess }) {
     // 2. Lưu đơn đăng ký lên Supabase Cloud Postgres
     if (supabase) {
       try {
-        const { error: insErr } = await supabase.from('users').insert([{
+        const userPayload = {
           username: newPendingUser.username,
           password: newPendingUser.password,
           full_name: newPendingUser.fullName,
           role: newPendingUser.role,
-          email: newPendingUser.email,
           status: 'PENDING'
-        }]);
+        };
+        const { error: insErr } = await supabase.from('users').insert([userPayload]);
 
         if (insErr) {
           if (insErr.code === '23505' || insErr.message.includes('unique')) {
