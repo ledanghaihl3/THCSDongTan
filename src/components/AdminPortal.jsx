@@ -145,8 +145,18 @@ export default function AdminPortal({
   const [docFileUrl, setDocFileUrl] = useState('');
   const [docExternalLink, setDocExternalLink] = useState('');
 
+  const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
+
+  // Helper check if status is explicitly approved/active
+  const isApprovedStatus = (status) => {
+    if (!status) return false;
+    const str = String(status).trim().toUpperCase();
+    return str === 'ACTIVE' || str === 'APPROVED' || str === 'ACTIVE_USER' || str === 'GRANTED';
+  };
+
   // Fetch all users directly from Supabase Cloud Postgres + LocalStorage fallback
   const fetchUsers = async () => {
+    setIsRefreshingUsers(true);
     let cloudActives = [];
     let cloudPendings = [];
 
@@ -154,7 +164,8 @@ export default function AdminPortal({
       try {
         const { data: usersData, error } = await supabase.from('users').select('*').order('id', { ascending: false });
         if (!error && usersData && usersData.length > 0) {
-          cloudActives = usersData.filter(u => u.status === 'ACTIVE' || u.status === 'APPROVED').map(u => ({
+          // Bất kỳ tài khoản nào mang status ACTIVE hoặc APPROVED -> Nạp vào danh sách hoạt động
+          cloudActives = usersData.filter(u => isApprovedStatus(u.status)).map(u => ({
             id: u.id,
             username: u.username,
             password: u.password,
@@ -164,14 +175,15 @@ export default function AdminPortal({
             status: 'ACTIVE',
             createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
           }));
-          cloudPendings = usersData.filter(u => u.status === 'PENDING' || u.status === 'PENDING_APPROVAL').map(u => ({
+          // BẤT KỲ TÀI KHOẢN NÀO CHƯA ACTIVE HOẶC APPROVED -> GOM VÀO DANH SÁCH CHỜ DUYỆT!
+          cloudPendings = usersData.filter(u => !isApprovedStatus(u.status)).map(u => ({
             id: u.id,
             username: u.username,
             password: u.password,
             fullName: u.full_name || u.fullName || u.username,
             role: u.role || 'HOC_SINH',
             email: u.email || '',
-            status: u.status,
+            status: u.status || 'PENDING',
             createdAt: u.created_at ? new Date(u.created_at).toLocaleDateString('vi-VN') : 'Gần đây'
           }));
         }
@@ -180,11 +192,19 @@ export default function AdminPortal({
       }
     }
 
-    // Combine with LocalStorage pending registrations
+    // Combine with ALL LocalStorage pending registration keys
+    const localKeys = ['portal_pending_users', 'pending_users', 'thcs_pending_users', 'registered_users', 'portal_users'];
     let localPendings = [];
-    try {
-      localPendings = JSON.parse(localStorage.getItem('portal_pending_users') || '[]');
-    } catch (e) {}
+    localKeys.forEach(key => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) localPendings.push(...parsed);
+        }
+      } catch (e) {}
+    });
+
     if (pendingUsers && pendingUsers.length > 0) {
       localPendings = [...localPendings, ...pendingUsers];
     }
@@ -217,6 +237,13 @@ export default function AdminPortal({
 
     setUserList(cloudActives.length > 0 ? cloudActives : defaultActives);
     setPendingList(combinedPendings);
+    setIsRefreshingUsers(false);
+
+    if (onRefreshData) {
+      try { onRefreshData(); } catch (e) {}
+    }
+
+    setMessage(`🔄 ĐÃ LÀM TƯƠI DỮ LIỆU THÀNH CÔNG! Tìm thấy ${combinedPendings.length} tài khoản chờ duyệt & ${cloudActives.length} tài khoản đã kích hoạt.`);
   };
 
   useEffect(() => {
@@ -896,10 +923,11 @@ export default function AdminPortal({
               <button
                 type="button"
                 onClick={fetchUsers}
-                style={{ background: '#dc2626', color: 'white', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}
-                title="Bấm để cập nhật lại danh sách đăng ký mới nhất từ Cloud & Thiết bị"
+                disabled={isRefreshingUsers}
+                style={{ background: isRefreshingUsers ? '#94a3b8' : '#dc2626', color: 'white', border: 'none', padding: '5px 12px', borderRadius: '4px', cursor: isRefreshingUsers ? 'wait' : 'pointer', fontSize: '12px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Bấm để quét & cập nhật lại toàn bộ danh sách đăng ký mới nhất từ Cloud & Thiết bị"
               >
-                🔄 LÀM TƯƠI DANH SÁCH DUYỆT
+                {isRefreshingUsers ? '⏳ ĐANG QUÉT...' : '🔄 LÀM TƯƠI DANH SÁCH DUYỆT'}
               </button>
             </div>
             {pendingList.length === 0 ? (
